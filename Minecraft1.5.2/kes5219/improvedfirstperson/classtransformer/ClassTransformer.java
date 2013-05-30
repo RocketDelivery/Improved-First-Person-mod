@@ -60,6 +60,7 @@ public class ClassTransformer implements IClassTransformer {
 			System.out.println("Improved First Person Mod: Successfully injected hook into renderWorld in EntityRenderer");
 			
 			byte[] tempByte3 = ClassTransformHelper.injectCustomHook(tempByte2, new MethodGetMouseOverTransformer(), ObfuscationTable.MethodGetMouseOver, ObfuscationTable.MethodGetMouseOverDesc);
+			System.out.println("Improved First Person Mod: Successfully injected hook into getMouseOver in EntityRenderer");
 			return tempByte3;
 		} else
 		if(name.equals(ObfuscationTable.ClassRenderFish)) {
@@ -71,16 +72,6 @@ public class ClassTransformer implements IClassTransformer {
 			System.out.println(ObfuscationTable.MethodRenderEntities + " " + ObfuscationTable.MethodRenderEntitiesDesc);
 			byte[] returnVal = ClassTransformHelper.injectSimpleHookAtProfilerSection(bytes, ObfuscationTable.MethodRenderEntities, ObfuscationTable.MethodRenderEntitiesDesc, "kes5219/improvedfirstperson/hooks/RenderEntityHook", "onRenderEntities", "tileentities");
 			System.out.println("Improved First Person Mod: Successfully modified renderEntities in RenderGlobal");
-			
-			/*try {
-				FileOutputStream str = new FileOutputStream(new File("C:/Users/Suyoung Choi/Documents/EntityRenderer.class"));
-				str.write(returnVal);
-				str.close();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/
-			
 			return returnVal;
 		}
 		
