@@ -17,7 +17,7 @@ public class ItemRendererHook {
 	//By returning false, this method prevents rendering of default first person handheld item and player hand.
     public static boolean shouldRenderItemInFirstPerson()
 	{
-    	/*GameSettings settings = IFPClientProxy.mc.gameSettings;
+    	GameSettings settings = IFPClientProxy.mc.gameSettings;
 		if(settings.thirdPersonView == 0 && !IFPClientProxy.mc.renderViewEntity.isPlayerSleeping() && !settings.hideGUI)
 		{
 			//Do not render the item and hand
@@ -26,7 +26,6 @@ public class ItemRendererHook {
 		{
 			//render the item and hand
 			return true;
-		}*/
-    	return false;
+		}
 	}
 }
