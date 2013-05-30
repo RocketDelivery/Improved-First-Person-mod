@@ -7,11 +7,6 @@ import kes5219.improvedfirstperson.common.ModImprovedFirstPerson;
 
 import org.lwjgl.input.Keyboard;
 
-import quivermod.PlayerValueManager;
-import quivermod.QuiverBow;
-import quivermod.QuiverInventory;
-import quivermod.QuiverMod;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
