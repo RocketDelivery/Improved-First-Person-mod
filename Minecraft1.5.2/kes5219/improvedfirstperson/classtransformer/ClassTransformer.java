@@ -55,11 +55,12 @@ public class ClassTransformer implements IClassTransformer {
 		if(name.equals(ObfuscationTable.ClassEntityRenderer)) {
 			byte[] tempByte1 =  ClassTransformHelper.changeFieldAcess(bytes, ObfuscationTable.FieldRendererUpdateCount, Opcodes.ACC_PUBLIC);
 			System.out.println("Improved First Person Mod: Successfully changed the field rendererUpdateCount to public in EntityRenderer");
-			
-			byte[] tempByte2 = ClassTransformHelper.injectSimpleHookAtProfilerSection(bytes, ObfuscationTable.MethodRenderWorld, ObfuscationTable.MethodRenderWorldDesc, "kes5219/improvedfirstperson/hooks/AfterCameraTransformation", "afterCameraTransform", "frustrum");
+						
+			byte[] tempByte2 = ClassTransformHelper.injectSimpleHookAtProfilerSection(tempByte1, ObfuscationTable.MethodRenderWorld, ObfuscationTable.MethodRenderWorldDesc, "kes5219/improvedfirstperson/hooks/AfterCameraTransformation", "afterCameraTransform", "frustrum");
 			System.out.println("Improved First Person Mod: Successfully injected hook into renderWorld in EntityRenderer");
 			
-			return tempByte2;
+			byte[] tempByte3 = ClassTransformHelper.injectCustomHook(tempByte2, new MethodGetMouseOverTransformer(), ObfuscationTable.MethodGetMouseOver, ObfuscationTable.MethodGetMouseOverDesc);
+			return tempByte3;
 		} else
 		if(name.equals(ObfuscationTable.ClassRenderFish)) {
 			byte[] returnVal = ClassTransformHelper.injectCustomHook(bytes, new MethodDoRenderFishHookTransformer(), ObfuscationTable.MethodDoRenderFishHook, ObfuscationTable.MethodDoRenderFishHookDesc);
@@ -90,13 +91,13 @@ public class ClassTransformer implements IClassTransformer {
 		 
 		public void visitCode() {
 			mv.visitCode();
-			mv.visitMethodInsn(Opcodes.INVOKESTATIC, "kes5219/improvedfirstperson/classtransformer/hooks/RenderFishHook", "onMethodStart", "()V");
+			mv.visitMethodInsn(Opcodes.INVOKESTATIC, "kes5219/improvedfirstperson/hooks/RenderFishHook", "onMethodStart", "()V");
 		}
 		
 		 
 		public void visitInsn(int opcode) {
 			if(opcode == Opcodes.RETURN) {
-				mv.visitMethodInsn(Opcodes.INVOKESTATIC, "kes5219/improvedfirstperson/classtransformer/hooks/RenderFishHook", "onMethodEnd", "()V");
+				mv.visitMethodInsn(Opcodes.INVOKESTATIC, "kes5219/improvedfirstperson/hooks/RenderFishHook", "onMethodEnd", "()V");
 			}
 			mv.visitInsn(opcode);
 		}
@@ -106,13 +107,13 @@ public class ClassTransformer implements IClassTransformer {
 		 
 		public void visitCode() {
 			mv.visitCode();
-			mv.visitMethodInsn(Opcodes.INVOKESTATIC, "kes5219/improvedfirstperson/classtransformer/hooks/MouseSelectionOverride", "onMethodStart", "()V");
+			mv.visitMethodInsn(Opcodes.INVOKESTATIC, "kes5219/improvedfirstperson/hooks/MouseSelectionOverride", "onMethodStart", "()V");
 		}
 		
 		 
 		public void visitInsn(int opcode) {
 			if(opcode == Opcodes.RETURN) {
-				mv.visitMethodInsn(Opcodes.INVOKESTATIC, "kes5219/improvedfirstperson/classtransformer/hooks/MouseSelectionOverride", "onMethodEnd", "()V");
+				mv.visitMethodInsn(Opcodes.INVOKESTATIC, "kes5219/improvedfirstperson/hooks/MouseSelectionOverride", "onMethodEnd", "()V");
 			}
 			mv.visitInsn(opcode);
 		}
