@@ -43,7 +43,7 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 		}
 	}
 
-	private static final int swingRotation = -130;
+	private static final int swingRotation = -140;
 	private static final int swingRotationWindup = 35;
 	private static final float swingCancel = 0.7F;
 	
