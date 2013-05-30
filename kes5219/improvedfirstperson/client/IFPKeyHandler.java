@@ -23,6 +23,7 @@ public class IFPKeyHandler extends KeyHandler {
 	
 	static KeyBinding toggle = new KeyBinding("Toggle IFP View", Keyboard.KEY_F6);
 	
+	// Simple constructor that sends arguments to the KeyHandler constructor.
 	public IFPKeyHandler() {
 		super(new KeyBinding[]{toggle},
 				new boolean[]{false});
@@ -33,21 +34,12 @@ public class IFPKeyHandler extends KeyHandler {
 		return "ModImprovedFirstPersonBindings";
 	}
 	
-	private void clearBowUse(EntityPlayer player)
-	{
-		ItemStack heldItem = player.inventory.getCurrentItem();
-		
-		if (heldItem != null && heldItem.getItem() instanceof QuiverBow)
-		{
-			player.clearItemInUse();
-		}
-	}
-	
 	@Override
 	public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd, boolean isRepeat)
 	{
 	}
 	
+	// Key up method, used to toggle the body rendering.
 	@Override
 	public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd) {
 		if (tickEnd && IFPClientProxy.mc.currentScreen == null)

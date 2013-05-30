@@ -83,6 +83,7 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 			modelPlayer.heldItemLeft = 0;
 		}
 		
+		// Make player lean over when looking down
 		if (var7.rotationPitch > 0)
 		{
 			float off;
