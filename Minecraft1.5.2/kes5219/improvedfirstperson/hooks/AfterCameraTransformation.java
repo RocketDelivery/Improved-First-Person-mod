@@ -78,7 +78,7 @@ public class AfterCameraTransformation {
 			        GL11.glRotatef(player.prevRotationYaw + (player.rotationYaw - player.prevRotationYaw) * partialTick + 180.0F, 0.0F, 1.0F, 0.0F);
 				}
 			}
-	        //ActiveRenderInfo.updateRenderInfo(mc.thePlayer, mc.gameSettings.thirdPersonView == 2);
+	        ActiveRenderInfo.updateRenderInfo(mc.thePlayer, mc.gameSettings.thirdPersonView == 2);
 	        //determineCrosshairPosition(partialTick/*camXOffset, camYOffset, camZOffset*/);
 		}
 	}
