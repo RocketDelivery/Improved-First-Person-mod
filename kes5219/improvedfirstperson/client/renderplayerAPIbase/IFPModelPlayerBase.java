@@ -35,13 +35,15 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 	
 	 
 	public void afterSetRotationAngles(float var1, float var2, float var3, float var4, float var5, float var6, Entity var7) {
-		Minecraft mc = Minecraft.getMinecraft();		
+		Minecraft mc = Minecraft.getMinecraft();
+		
 		if(RenderManager.instance.playerViewY == 180.0f) {
 			//if the inventory screen is open
 			modelPlayer.bipedHead.isHidden = false;
 			modelPlayer.bipedHeadwear.isHidden = false;
 			return;
 		}
+		
 		if((mc.gameSettings.thirdPersonView == 0 && var7 == mc.renderViewEntity) || mc.renderViewEntity.isPlayerSleeping()) {
 			modelPlayer.bipedHead.isHidden = true;
 			modelPlayer.bipedHeadwear.isHidden = true;
@@ -51,6 +53,7 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 		}
 		
 		ItemStack item = ((EntityLiving)var7).getHeldItem();
+		
 		if(item != null && (Item.map.itemID == item.itemID || Item.emptyMap.itemID == item.itemID)) {
 			modelPlayer.bipedRightArm.rotateAngleX = -(float)Math.PI/9;
 			modelPlayer.bipedLeftArm.rotateAngleX = -(float)Math.PI/9;
@@ -62,6 +65,7 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 			modelPlayer.bipedRightArm.rotateAngleX += MathHelper.sin(var3 * 0.067F) * 0.05F;
 			modelPlayer.bipedLeftArm.rotateAngleX -= MathHelper.sin(var3 * 0.067F) * 0.05F;
 		}
+		
 		if(modelPlayer.aimedBow) {
 			EntityPlayer player = (EntityPlayer)var7;
 			player.renderYawOffset = player.rotationYawHead + 50F;
@@ -74,9 +78,41 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 		    modelPlayer.bipedRightArm.rotateAngleX += 0.15F * (MathHelper.sin(var3 * 0.067F) * 0.05F);
 		    modelPlayer.bipedLeftArm.rotateAngleX -= 0.15F * (MathHelper.sin(var3 * 0.067F) * 0.05F);
 		}
+		
 		if(item == null || Item.itemsList[item.itemID] instanceof ItemBow) {
 			modelPlayer.heldItemLeft = 0;
 		}
+		
+		if (var7.rotationPitch > 0)
+		{
+			float off;
+			float fovMult = ((mc.thePlayer != var7 || mc.gameSettings.thirdPersonView > 0) ? 0.75F : (mc.gameSettings.fovSetting + 1));
+			
+			if (fovMult > 1.75F)
+				fovMult = 1.75F;
+			
+			if (!((EntityPlayer)var7).isUsingItem())
+			{
+				off = var7.rotationPitch / 250F * fovMult;
+				modelPlayer.bipedLeftArm.rotateAngleZ -= off;
+				modelPlayer.bipedRightArm.rotateAngleZ += off;
+			}
+			
+			if (!modelPlayer.isSneak)
+			{
+				off = var7.rotationPitch / 180F * fovMult;
+				modelPlayer.bipedBody.rotateAngleX += off;
+				
+				off = var7.rotationPitch / 16F * fovMult;
+				modelPlayer.bipedRightLeg.rotationPointZ += off;
+				modelPlayer.bipedLeftLeg.rotationPointZ += off;
+	
+				off = var7.rotationPitch / 50F * fovMult;
+				modelPlayer.bipedRightLeg.rotationPointY -= off;
+				modelPlayer.bipedLeftLeg.rotationPointY -= off;
+			}
+		}
+		
 		//modelPlayer.bipedLeftArm.rotateAngleZ = 0;
 		//modelPlayer.bipedLeftArm.rotateAngleX = 0;
 		//modelPlayer.bipedLeftArm.rotateAngleY = var1 * 0.001f;
