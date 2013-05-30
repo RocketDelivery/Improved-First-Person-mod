@@ -142,7 +142,7 @@ public class AfterCameraTransformation {
         
         //mc.entityRenderer.rendererUpdateCount is private by default, but changed to public
         //during initialization using class transformer.
-        int rendererUpdateCount = 0;//mc.entityRenderer.rendererUpdateCount;
+        int rendererUpdateCount = mc.entityRenderer.rendererUpdateCount;
         if (timeInPortal > 0.0F)
         {
             byte var5 = 20;
