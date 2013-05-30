@@ -36,6 +36,7 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 	 
 	public void afterSetRotationAngles(float var1, float var2, float var3, float var4, float var5, float var6, Entity var7) {
 		Minecraft mc = Minecraft.getMinecraft();
+		EntityPlayer player = (EntityPlayer)var7;
 		
 		if(RenderManager.instance.playerViewY == 180.0f) {
 			//if the inventory screen is open
@@ -52,7 +53,7 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 			modelPlayer.bipedHeadwear.isHidden = false;
 		}
 		
-		ItemStack item = ((EntityLiving)var7).getHeldItem();
+		ItemStack item = player.getHeldItem();
 		
 		if(item != null && (Item.map.itemID == item.itemID || Item.emptyMap.itemID == item.itemID)) {
 			modelPlayer.bipedRightArm.rotateAngleX = -(float)Math.PI/9;
@@ -67,7 +68,6 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 		}
 		
 		if(modelPlayer.aimedBow) {
-			EntityPlayer player = (EntityPlayer)var7;
 			player.renderYawOffset = player.rotationYawHead + 50F;
 			modelPlayer.bipedLeftArm.rotateAngleX -= 0.2F;
 			modelPlayer.bipedLeftArm.rotateAngleY += 0.15F;
@@ -91,7 +91,7 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 			if (fovMult > 1.75F)
 				fovMult = 1.75F;
 			
-			if (!((EntityPlayer)var7).isUsingItem())
+			if (!player.isUsingItem())
 			{
 				off = var7.rotationPitch / 250F * fovMult;
 				modelPlayer.bipedLeftArm.rotateAngleZ -= off;
