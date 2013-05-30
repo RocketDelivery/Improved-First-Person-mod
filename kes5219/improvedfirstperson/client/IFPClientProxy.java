@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.TickRegistry;
@@ -26,14 +27,14 @@ public class IFPClientProxy extends IFPCommonProxy {
 	private static final int EMPTYMAPITEMID = 395;
 	public static Minecraft mc;
 	
-	 
 	public void preInit(FMLPreInitializationEvent event) {
 		mc = Minecraft.getMinecraft();
 		RenderPlayerAPI.register("kes5219_improvedfirstperson", IFPRenderPlayerBase.class);
 		ModelPlayerAPI.register("kes5219_improvedfirstperson", IFPModelPlayerBase.class);
+        
+		KeyBindingRegistry.registerKeyBinding(new IFPKeyHandler());
 	}
-
-	 
+	
 	public void init(FMLInitializationEvent event) {
 		//AfterCameraTransformation.init();
 		MinecraftForgeClient.registerItemRenderer(Item.map.itemID, new FirstPersonMapRenderer());

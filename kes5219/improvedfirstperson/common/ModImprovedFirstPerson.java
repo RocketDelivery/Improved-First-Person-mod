@@ -39,7 +39,9 @@ import cpw.mods.fml.common.registry.TickRegistry;
 @Mod(modid = "kes5219_improvedfirstperson", name = "Improved First Person View Mod", version = "1.5.2_r1")
 @NetworkMod(clientSideRequired = true, serverSideRequired = false)
 public class ModImprovedFirstPerson
-{	
+{
+	public static boolean enableBodyRender = true;
+	
 	@SidedProxy(clientSide="kes5219.improvedfirstperson.client.IFPClientProxy", serverSide="kes5219.improvedfirstperson.common.IFPCommonProxy")
 	public static IFPCommonProxy proxy;
 	

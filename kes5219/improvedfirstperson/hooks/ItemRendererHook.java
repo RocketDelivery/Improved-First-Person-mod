@@ -18,11 +18,13 @@ public class ItemRendererHook {
     public static boolean shouldRenderItemInFirstPerson()
 	{
     	GameSettings settings = IFPClientProxy.mc.gameSettings;
-		if(settings.thirdPersonView == 0 && !IFPClientProxy.mc.renderViewEntity.isPlayerSleeping() && !settings.hideGUI)
+    	
+		if(ModImprovedFirstPerson.enableBodyRender && settings.thirdPersonView == 0 && !IFPClientProxy.mc.renderViewEntity.isPlayerSleeping() && !settings.hideGUI)
 		{
 			//Do not render the item and hand
 			return false;
-		} else
+		}
+		else
 		{
 			//render the item and hand
 			return true;

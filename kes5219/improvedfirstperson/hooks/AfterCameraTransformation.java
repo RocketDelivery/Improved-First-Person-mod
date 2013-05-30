@@ -34,52 +34,58 @@ public class AfterCameraTransformation {
 	//
 	//This method handles camera transformation and its functionalities are to
 	//to offset the camera to make it look more realistic and to prevent users from seeing through blocks
-	public static void afterCameraTransform() {		
-		Minecraft mc = IFPClientProxy.mc;
-		EntityPlayer player = (EntityPlayer)mc.renderViewEntity;
-		float partialTick = PartialTickRetriever.getPartialTick();
-		
-		if(!player.isPlayerSleeping() && mc.gameSettings.thirdPersonView == 0)
+	public static void afterCameraTransform() {
+		if (ModImprovedFirstPerson.enableBodyRender)
 		{
-	        float camXOffset = ActiveRenderInfo.objectX;
-	        float camYOffset = ActiveRenderInfo.objectY;
-	        float camZOffset = ActiveRenderInfo.objectZ;
-	        
-			GL11.glLoadIdentity();
-			displayOverlayEffects(partialTick);
-			GL11.glTranslatef(0.0f, -EYE_OFFSET_HEIGHT, 0.0f);
-	        GL11.glRotatef(player.prevRotationPitch + (player.rotationPitch - player.prevRotationPitch) * partialTick, 1.0F, 0.0F, 0.0F);
-	        GL11.glTranslatef(0.0f, 0.0625f, EYE_OFFSET);
-	        GL11.glRotatef(player.prevRotationYaw + (player.rotationYaw - player.prevRotationYaw) * partialTick + 180.0F, 0.0F, 1.0F, 0.0F);
-	        ActiveRenderInfo.updateRenderInfo(mc.thePlayer, mc.gameSettings.thirdPersonView == 2);
-
-			double xOffset = player.posX + ActiveRenderInfo.objectX;
-			double yOffset = player.posY + ActiveRenderInfo.objectY;
-			double zOffset = player.posZ + ActiveRenderInfo.objectZ;
+			Minecraft mc = IFPClientProxy.mc;
+			EntityPlayer player = (EntityPlayer)mc.renderViewEntity;
+			float partialTick = PartialTickRetriever.getPartialTick();
 			
-			MovingObjectPosition movingObjPos = player.rayTrace(EYE_OFFSET, 1.0f);
-			if(movingObjPos != null) {
-				int blockID = player.worldObj.getBlockId(movingObjPos.blockX, movingObjPos.blockY, movingObjPos.blockZ);
-				if(!Block.blocksList[blockID].isOpaqueCube()) {
-					double xDisp = movingObjPos.hitVec.xCoord - xOffset;//player.posX;
-					double yDisp = movingObjPos.hitVec.yCoord - yOffset;//player.posY;
-					double zDisp = movingObjPos.hitVec.zCoord - zOffset;//player.posZ;
-					double length = Math.sqrt(xDisp * xDisp + yDisp * yDisp + zDisp * zDisp);
-					float eyeDisplacement = EYE_OFFSET_HEIGHT;
-					if(length < EYE_OFFSET_HEIGHT) {
-						eyeDisplacement = (float)length;
+			if (!player.isPlayerSleeping() && mc.gameSettings.thirdPersonView == 0)
+			{
+		        float camXOffset = ActiveRenderInfo.objectX;
+		        float camYOffset = ActiveRenderInfo.objectY;
+		        float camZOffset = ActiveRenderInfo.objectZ;
+		        
+				GL11.glLoadIdentity();
+				displayOverlayEffects(partialTick);
+				GL11.glTranslatef(0.0f, -EYE_OFFSET_HEIGHT, 0.0f);
+		        GL11.glRotatef(player.prevRotationPitch + (player.rotationPitch - player.prevRotationPitch) * partialTick, 1.0F, 0.0F, 0.0F);
+		        GL11.glTranslatef(0.0f, 0.0625f, EYE_OFFSET);
+		        GL11.glRotatef(player.prevRotationYaw + (player.rotationYaw - player.prevRotationYaw) * partialTick + 180.0F, 0.0F, 1.0F, 0.0F);
+		        ActiveRenderInfo.updateRenderInfo(mc.thePlayer, mc.gameSettings.thirdPersonView == 2);
+	
+				double xOffset = player.posX + ActiveRenderInfo.objectX;
+				double yOffset = player.posY + ActiveRenderInfo.objectY;
+				double zOffset = player.posZ + ActiveRenderInfo.objectZ;
+				
+				MovingObjectPosition movingObjPos = player.rayTrace(EYE_OFFSET, 1.0f);
+				
+				if (movingObjPos != null) {
+					int blockID = player.worldObj.getBlockId(movingObjPos.blockX, movingObjPos.blockY, movingObjPos.blockZ);
+					
+					if (!Block.blocksList[blockID].isOpaqueCube()) {
+						double xDisp = movingObjPos.hitVec.xCoord - xOffset;//player.posX;
+						double yDisp = movingObjPos.hitVec.yCoord - yOffset;//player.posY;
+						double zDisp = movingObjPos.hitVec.zCoord - zOffset;//player.posZ;
+						double length = Math.sqrt(xDisp * xDisp + yDisp * yDisp + zDisp * zDisp);
+						float eyeDisplacement = EYE_OFFSET_HEIGHT;
+						if(length < EYE_OFFSET_HEIGHT) {
+							eyeDisplacement = (float)length;
+						}
+						GL11.glLoadIdentity();
+						displayOverlayEffects(partialTick);
+						GL11.glTranslatef(0.0f, -eyeDisplacement, 0.0f);
+				        GL11.glRotatef(player.prevRotationPitch + (player.rotationPitch - player.prevRotationPitch) * partialTick, 1.0F, 0.0F, 0.0F);
+				        GL11.glTranslatef(0.0f, 0.0f, EYE_OFFSET);
+				        GL11.glTranslatef(0.0f, 0.063f, 0.0f);
+				        GL11.glRotatef(player.prevRotationYaw + (player.rotationYaw - player.prevRotationYaw) * partialTick + 180.0F, 0.0F, 1.0F, 0.0F);
 					}
-					GL11.glLoadIdentity();
-					displayOverlayEffects(partialTick);
-					GL11.glTranslatef(0.0f, -eyeDisplacement, 0.0f);
-			        GL11.glRotatef(player.prevRotationPitch + (player.rotationPitch - player.prevRotationPitch) * partialTick, 1.0F, 0.0F, 0.0F);
-			        GL11.glTranslatef(0.0f, 0.0f, EYE_OFFSET);
-			        GL11.glTranslatef(0.0f, 0.063f, 0.0f);
-			        GL11.glRotatef(player.prevRotationYaw + (player.rotationYaw - player.prevRotationYaw) * partialTick + 180.0F, 0.0F, 1.0F, 0.0F);
 				}
+				
+		        ActiveRenderInfo.updateRenderInfo(mc.thePlayer, mc.gameSettings.thirdPersonView == 2);
+		        //determineCrosshairPosition(partialTick/*camXOffset, camYOffset, camZOffset*/);
 			}
-	        ActiveRenderInfo.updateRenderInfo(mc.thePlayer, mc.gameSettings.thirdPersonView == 2);
-	        //determineCrosshairPosition(partialTick/*camXOffset, camYOffset, camZOffset*/);
 		}
 	}
 	
