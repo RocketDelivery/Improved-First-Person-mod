@@ -28,15 +28,11 @@ public class IFPKeyHandler extends KeyHandler {
 	public String getLabel() {
 		return "ModImprovedFirstPersonBindings";
 	}
-	
+
+	// Key down method, used to toggle the body rendering.
 	@Override
 	public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd, boolean isRepeat)
 	{
-	}
-	
-	// Key up method, used to toggle the body rendering.
-	@Override
-	public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd) {
 		if (tickEnd && IFPClientProxy.mc.currentScreen == null)
 		{
 			if (kb.keyCode == toggle.keyCode)
@@ -45,6 +41,9 @@ public class IFPKeyHandler extends KeyHandler {
 			}
 		}
 	}
+	
+	@Override
+	public void keyUp(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd) { }
 	
 	@Override
 	public EnumSet<TickType> ticks() {
