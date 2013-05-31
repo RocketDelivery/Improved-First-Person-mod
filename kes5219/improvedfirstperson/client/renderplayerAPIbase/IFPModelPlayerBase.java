@@ -18,7 +18,6 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 	public IFPModelPlayerBase(ModelPlayerAPI modelPlayerAPI) {
 		super(modelPlayerAPI);
 	}
-
 	 
 	public void beforeSetRotationAngles(float var1, float var2, float var3, float var4, float var5, float var6, Entity var7)
 	{
@@ -27,12 +26,12 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 	     //modelPlayer.bipedLeftLeg.rotationPointZ = 0.0f;
 	     //modelPlayer.bipedLeftLeg.rotationPointX = 2.0f;
 	     ItemStack item = ((EntityLiving)var7).getHeldItem();
+	     
 	     if(item != null && Item.itemsList[item.itemID] instanceof ItemBow) {
 	    	 modelPlayer.heldItemLeft = 1;
 	    	 modelPlayer.heldItemRight = 0;
 	     }
 	}
-	
 	 
 	public void afterSetRotationAngles(float var1, float var2, float var3, float var4, float var5, float var6, Entity var7) {
 		Minecraft mc = Minecraft.getMinecraft();
@@ -68,8 +67,7 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 		}
 		
 		if(modelPlayer.aimedBow) {
-			player.renderYawOffset = player.rotationYawHead + 50F;
-			modelPlayer.bipedLeftArm.rotateAngleX -= 0.2F;
+			player.renderYawOffset = player.rotationYawHead + 40;
 			modelPlayer.bipedLeftArm.rotateAngleY += 0.15F;
 			
 			var3 = var3 * 6.0f;
@@ -77,6 +75,29 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 		    modelPlayer.bipedLeftArm.rotateAngleZ -= 0.15F * (MathHelper.cos(var3 * 0.09F) * 0.05F + 0.05F);
 		    modelPlayer.bipedRightArm.rotateAngleX += 0.15F * (MathHelper.sin(var3 * 0.067F) * 0.05F);
 		    modelPlayer.bipedLeftArm.rotateAngleX -= 0.15F * (MathHelper.sin(var3 * 0.067F) * 0.05F);
+
+			float headAngle = modelPlayer.bipedHead.rotateAngleX * 15;
+		    float rot = headAngle / 45;
+		    boolean negative = rot < 0;
+		    
+		    rot *= rot * 2.5F;
+		    
+		    if (!negative)
+		    {
+		    	modelPlayer.bipedLeftArm.rotateAngleY += rot;
+		    	
+		    	rot -= 0.5F;
+		    	rot *= 0.75F;
+		    	
+		    	if (rot > 0)
+		    		modelPlayer.bipedLeftArm.rotateAngleX -= rot;
+		    }
+		    else
+		    {
+		    	modelPlayer.bipedLeftArm.rotateAngleZ -= rot;
+		    	modelPlayer.bipedLeftArm.rotateAngleX += rot;
+		    	modelPlayer.bipedRightArm.rotateAngleX += rot * 2;
+		    }
 		}
 		
 		if(item == null || Item.itemsList[item.itemID] instanceof ItemBow) {
@@ -94,7 +115,7 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 			
 			if (!player.isUsingItem())
 			{
-				off = var7.rotationPitch / 250F * fovMult;
+				off = Math.abs(var7.rotationPitch / 250F * fovMult);
 				modelPlayer.bipedLeftArm.rotateAngleZ -= off;
 				modelPlayer.bipedRightArm.rotateAngleZ += off;
 			}
@@ -108,7 +129,7 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 				modelPlayer.bipedRightLeg.rotationPointZ += off;
 				modelPlayer.bipedLeftLeg.rotationPointZ += off;
 	
-				off = var7.rotationPitch / 50F * fovMult;
+				off = Math.abs(var7.rotationPitch / 50F * fovMult);
 				modelPlayer.bipedRightLeg.rotationPointY -= off;
 				modelPlayer.bipedLeftLeg.rotationPointY -= off;
 			}

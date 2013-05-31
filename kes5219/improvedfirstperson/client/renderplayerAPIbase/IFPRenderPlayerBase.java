@@ -55,13 +55,53 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 			renderPlayer.getModelBipedMainField().bipedLeftArm.postRender(0.0625F);
             GL11.glTranslatef(-0.0625F, 0.4375F, 0.0625F);
             
-            float var5 = 0.625F;
-            GL11.glTranslatef(0.05F, -0.05F, 0.2F);
-            //GL11.glRotatef(-5.0F, 0.0F, 1.0F, 0.0F);
-            float zRot = 15F * renderPlayer.getModelBipedMainField().bipedHead.rotateAngleX;
-            GL11.glScalef(var5, -var5, var5);
-            GL11.glRotatef(-120.0F + zRot, 1.0F, 0.0F, 0.0F);
-            GL11.glRotatef(10F + zRot, 0.0F, 1.0F, 0.0F); //Y-axis
+            GL11.glScalef(0.625F, -0.625F, 0.625F);
+            GL11.glTranslatef(0.1F, 0, 0.3F);
+            
+            float rot = 15F * renderPlayer.getModelBipedMainField().bipedHead.rotateAngleX;
+            
+        	float correctionsRot = rot;
+            
+            if (correctionsRot > 0)
+            {
+            	correctionsRot *= 2;
+            	
+            	float max = 12.5F;
+            	
+            	if (correctionsRot > max)
+            	{
+            		correctionsRot = max - (correctionsRot - max);
+            	}
+            	
+            	correctionsRot = MathHelper.sqrt_float(correctionsRot);
+            	
+            	System.out.println(correctionsRot);
+            	
+            	if (correctionsRot > 0)
+            		GL11.glRotatef(correctionsRot, 0, 0, 1); //Z-axis
+            }
+            else
+            {
+            	correctionsRot *= -2;
+            	
+            	float yOff = -0.3F;
+            	float zOff = -0.5F;
+            	
+            	GL11.glTranslatef(0, yOff, zOff);
+            	GL11.glRotatef(correctionsRot, 1, 0, 0);
+            	GL11.glRotatef(correctionsRot * 0.8F, 0, 0, 1);
+            	GL11.glRotatef(correctionsRot, 0, 1, 0);
+            	GL11.glTranslatef(0, -yOff, -zOff);
+            }
+            
+            GL11.glRotatef(-120.0F, 1.0F, 0.0F, 0.0F);
+            
+            rot = Math.abs(rot);
+            
+            if (rot > 0)
+            {
+	            GL11.glRotatef(10F + rot, 0.0F, 1.0F, 0.0F); //Y-axis
+            }
 		}
 		else if (var1.isSwingInProgress && var1.swingProgress > 0)
 		{
