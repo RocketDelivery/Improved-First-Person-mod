@@ -75,8 +75,6 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
             	
             	correctionsRot = MathHelper.sqrt_float(correctionsRot);
             	
-            	System.out.println(correctionsRot);
-            	
             	if (correctionsRot > 0)
             		GL11.glRotatef(correctionsRot, 0, 0, 1); //Z-axis
             }
