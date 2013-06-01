@@ -1,12 +1,23 @@
 package kes5219.improvedfirstperson.client.renderplayerAPIbase;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+
+import kes5219.improvedfirstperson.client.IFPClientProxy;
 import kes5219.utils.misc.PartialTickRetriever;
 
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.ModelBox;
+import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBow;
@@ -16,6 +27,7 @@ import net.minecraft.item.ItemTool;
 import net.minecraft.src.ModelPlayer;
 import net.minecraft.src.RenderPlayerAPI;
 import net.minecraft.src.RenderPlayerBase;
+import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 
 public class IFPRenderPlayerBase extends RenderPlayerBase {
@@ -30,9 +42,8 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 		//do nothing
 	}*/
 	
-	 
 	public void renderSpecialHeadArmor(EntityPlayer var1, float var2) {
-		Minecraft mc = Minecraft.getMinecraft();
+		Minecraft mc = IFPClientProxy.mc;
 		/*if(mc.gameSettings.thirdPersonView > 0 && var1 == mc.renderViewEntity) {
 			renderPlayer.localRenderSpecialHeadArmor(var1, var2);
 		}*/
@@ -41,6 +52,133 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 			RenderManager.instance.playerViewY == 180.0f/*if the inventory is open*/) {
 			renderPlayer.localRenderSpecialHeadArmor(var1, var2);
 		}
+	}
+	
+	class ArrowPosition extends Object {
+	    ModelRenderer modelRenderer;
+	    float randX;
+	    float randY;
+	    float randZ;
+	    float arrowX;
+	    float arrowY;
+	    float arrowZ;
+	    
+	    public ArrowPosition(ModelRenderer modelRenderer,
+	    		float randX, float randY, float randZ,
+	    		float arrowX, float arrowY, float arrowZ)
+	    {
+	    	this.modelRenderer = modelRenderer;
+	    	this.randX = randX;
+	    	this.randY = randY;
+	    	this.randZ = randZ;
+	    	this.arrowX = arrowX;
+	    	this.arrowY = arrowY;
+	    	this.arrowZ = arrowZ;
+	    }
+	}
+	HashMap<Integer, ArrayList<ArrowPosition>> arrowCache = new HashMap();
+	
+	public void renderArrowsStuckInEntity(EntityLiving entity, float partialTick)
+	{
+        int arrowCount = entity.getArrowCountInEntity();
+
+        if (arrowCount > 0)
+        {
+            EntityArrow arrow = new EntityArrow(entity.worldObj, entity.posX, entity.posY, entity.posZ);
+            Random random = null;
+            
+            ArrayList<ArrowPosition> arrowList = arrowCache.get(entity.entityId);
+            
+            if (arrowList == null || arrowList.size() != arrowCount)
+            	arrowList = new ArrayList();
+            
+            RenderHelper.disableStandardItemLighting();
+
+            for (int arrowIndex = 0; arrowIndex < arrowCount; ++arrowIndex)
+            {
+                GL11.glPushMatrix();
+                
+                ModelRenderer modelRenderer = null;
+                ModelBox box = null;
+                
+                // Translation
+                float randX = 0;
+                float randY = 0;
+                float randZ = 0;
+                float arrowX = 0;
+                float arrowY = 0;
+                float arrowZ = 0;
+            	
+            	if (arrowList.size() == arrowCount)
+            	{
+	            	ArrowPosition arrowPos = arrowList.get(arrowIndex);
+	            	
+	            	if (arrowPos != null)
+	            	{
+	            		modelRenderer = arrowPos.modelRenderer;
+	            		randX = arrowPos.randX;
+	            		randY = arrowPos.randY;
+	            		randZ = arrowPos.randZ;
+	            		arrowX = arrowPos.arrowX;
+	            	}
+            	}
+                
+                if (modelRenderer == null)
+                {
+                	AxisAlignedBB headBB = AxisAlignedBB.getAABBPool().getAABB(-0.4F, -0.8F, -0.4F, 0.4F, 0.2F, 0.4F);
+                	
+                	if (random == null)
+                		random = new Random((long)entity.entityId);
+                	
+                	int tries = 0;
+                	
+	                while (tries < 10 && (modelRenderer == null ||
+	                		(entity == IFPClientProxy.mc.renderViewEntity &&
+	                		headBB.isVecInside(entity.worldObj.getWorldVec3Pool().getVecFromPool(arrowX, arrowY, arrowZ)))))
+	                {
+	                	modelRenderer = renderPlayer.getMainModelField().getRandomModelBox(random);
+	                	box = (ModelBox)modelRenderer.cubeList.get(random.nextInt(modelRenderer.cubeList.size()));
+	                	
+	                	randX = random.nextFloat();
+	                	randY = random.nextFloat();
+	                	randZ = random.nextFloat();
+	                	
+	                	arrowX = (box.posX1 + (box.posX2 - box.posX1) * randX) / 16.0F;
+	                	arrowY = (box.posY1 + (box.posY2 - box.posY1) * randY) / 16.0F;
+	                	arrowZ = (box.posZ1 + (box.posZ2 - box.posZ1) * randZ) / 16.0F;
+	                	
+	                	tries++;
+	                }
+	                
+	                arrowList.add(new ArrowPosition(modelRenderer,
+	                		randX, randY, randZ,
+	                		arrowX, arrowY, arrowZ));
+                }
+                
+                modelRenderer.postRender(0.0625F);
+                
+                GL11.glTranslatef(arrowX, arrowY, arrowZ);
+                
+                // Rotation
+                randX = randX * 2.0F - 1.0F;
+                randY = randY * 2.0F - 1.0F;
+                randZ = randZ * 2.0F - 1.0F;
+                randX *= -1.0F;
+                randY *= -1.0F;
+                randZ *= -1.0F;
+                float dist = MathHelper.sqrt_float(randX * randX + randZ * randZ);
+                arrow.prevRotationYaw = arrow.rotationYaw = (float)(Math.atan2(randX, randZ) * 180.0D / Math.PI);
+                arrow.prevRotationPitch = arrow.rotationPitch = (float)(Math.atan2(randY, dist) * 180.0D / Math.PI);
+                
+                // Render
+                renderPlayer.getRenderManagerField().renderEntityWithPosYaw(arrow, 0, 0, 0, 0, partialTick);
+                
+                GL11.glPopMatrix();
+            }
+
+            arrowCache.put(entity.entityId, arrowList);
+            RenderHelper.enableStandardItemLighting();
+        }
 	}
 
 	private static final int swingRotation = -140;
