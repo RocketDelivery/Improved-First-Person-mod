@@ -225,7 +225,7 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 				GL11.glTranslatef(0, yOff, zOff);
 				GL11.glRotatef(correctionsRot, 1, 0, 0);
 				GL11.glRotatef(correctionsRot * 0.8F, 0, 0, 1);
-				GL11.glRotatef(correctionsRot, 0, 1, 0);
+				GL11.glRotatef(correctionsRot * 1.5F, 0, 1, 0);
 				GL11.glTranslatef(0, -yOff, -zOff);
 			}
 
