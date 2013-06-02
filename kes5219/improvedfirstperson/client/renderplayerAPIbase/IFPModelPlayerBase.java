@@ -97,7 +97,7 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 			{
 				modelPlayer.bipedLeftArm.rotateAngleZ -= rot;
 				modelPlayer.bipedLeftArm.rotateAngleX += rot;
-				modelPlayer.bipedRightArm.rotateAngleX += rot * 2;
+				modelPlayer.bipedRightArm.rotateAngleX += rot * 2.75F;
 			}
 		}
 

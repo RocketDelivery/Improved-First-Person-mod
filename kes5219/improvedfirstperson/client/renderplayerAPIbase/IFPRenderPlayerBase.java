@@ -217,7 +217,7 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 			}
 			else
 			{
-				correctionsRot *= -2;
+				correctionsRot *= -1.6F;
 
 				float yOff = -0.3F;
 				float zOff = -0.5F;
