@@ -19,13 +19,13 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 	}
 
 	@Override
-	public void beforeSetRotationAngles(float var1, float var2, float var3, float var4, float var5, float var6, Entity var7)
+	public void beforeSetRotationAngles(float legSwing, float legYaw, float ticksExistedPartial, float headYawOffset, float pitch, float scale, Entity entity)
 	{
 		//modelPlayer.bipedRightLeg.rotationPointZ = 0.0f;
 		//modelPlayer.bipedRightLeg.rotationPointX = -2.0f;
 		//modelPlayer.bipedLeftLeg.rotationPointZ = 0.0f;
 		//modelPlayer.bipedLeftLeg.rotationPointX = 2.0f;
-		ItemStack item = ((EntityLiving)var7).getHeldItem();
+		ItemStack item = ((EntityLiving)entity).getHeldItem();
 
 		if(item != null && Item.itemsList[item.itemID] instanceof ItemBow) {
 			modelPlayer.heldItemLeft = 1;
@@ -34,7 +34,7 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 	}
 
 	@Override
-	public void afterSetRotationAngles(float var1, float var2, float var3, float var4, float var5, float partialTick, Entity entity) {
+	public void afterSetRotationAngles(float legSwing, float legYaw, float ticksExistedPartial, float headYawOffset, float pitch, float scale, Entity entity) {
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayer player = (EntityPlayer)entity;
 
@@ -61,21 +61,21 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 			modelPlayer.bipedRightArm.rotateAngleZ = 0;
 			modelPlayer.bipedLeftArm.rotateAngleZ = 0;
 
-			modelPlayer.bipedRightArm.rotateAngleZ += MathHelper.cos(var3 * 0.09F) * 0.05F + 0.05F;
-			modelPlayer.bipedLeftArm.rotateAngleZ -= MathHelper.cos(var3 * 0.09F) * 0.05F + 0.05F;
-			modelPlayer.bipedRightArm.rotateAngleX += MathHelper.sin(var3 * 0.067F) * 0.05F;
-			modelPlayer.bipedLeftArm.rotateAngleX -= MathHelper.sin(var3 * 0.067F) * 0.05F;
+			modelPlayer.bipedRightArm.rotateAngleZ += MathHelper.cos(ticksExistedPartial * 0.09F) * 0.05F + 0.05F;
+			modelPlayer.bipedLeftArm.rotateAngleZ -= MathHelper.cos(ticksExistedPartial * 0.09F) * 0.05F + 0.05F;
+			modelPlayer.bipedRightArm.rotateAngleX += MathHelper.sin(ticksExistedPartial * 0.067F) * 0.05F;
+			modelPlayer.bipedLeftArm.rotateAngleX -= MathHelper.sin(ticksExistedPartial * 0.067F) * 0.05F;
 		}
 
 		if (modelPlayer.aimedBow) {
 			player.renderYawOffset = player.rotationYawHead + 40;
 			modelPlayer.bipedLeftArm.rotateAngleY += 0.15F;
 
-			var3 = var3 * 6.0f;
-			modelPlayer.bipedRightArm.rotateAngleZ += 0.15F * (MathHelper.cos(var3 * 0.09F) * 0.05F + 0.05F);
-			modelPlayer.bipedLeftArm.rotateAngleZ -= 0.15F * (MathHelper.cos(var3 * 0.09F) * 0.05F + 0.05F);
-			modelPlayer.bipedRightArm.rotateAngleX += 0.15F * (MathHelper.sin(var3 * 0.067F) * 0.05F);
-			modelPlayer.bipedLeftArm.rotateAngleX -= 0.15F * (MathHelper.sin(var3 * 0.067F) * 0.05F);
+			ticksExistedPartial = ticksExistedPartial * 6.0f;
+			modelPlayer.bipedRightArm.rotateAngleZ += 0.15F * (MathHelper.cos(ticksExistedPartial * 0.09F) * 0.05F + 0.05F);
+			modelPlayer.bipedLeftArm.rotateAngleZ -= 0.15F * (MathHelper.cos(ticksExistedPartial * 0.09F) * 0.05F + 0.05F);
+			modelPlayer.bipedRightArm.rotateAngleX += 0.15F * (MathHelper.sin(ticksExistedPartial * 0.067F) * 0.05F);
+			modelPlayer.bipedLeftArm.rotateAngleX -= 0.15F * (MathHelper.sin(ticksExistedPartial * 0.067F) * 0.05F);
 
 			float headAngle = modelPlayer.bipedHead.rotateAngleX * 15;
 			float rot = headAngle / 45;
