@@ -1,6 +1,8 @@
 package kes5219.improvedfirstperson.client.renderplayerAPIbase;
 
+import kes5219.improvedfirstperson.client.IFPClientProxy;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -14,6 +16,9 @@ import net.minecraft.src.ModelPlayerBase;
 import net.minecraft.util.MathHelper;
 
 public class IFPModelPlayerBase  extends ModelPlayerBase {
+	
+	private float prevStrafeOffset = 0;
+	
 	public IFPModelPlayerBase(ModelPlayerAPI modelPlayerAPI) {
 		super(modelPlayerAPI);
 	}
@@ -98,6 +103,18 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 				modelPlayer.bipedLeftArm.rotateAngleZ -= rot;
 				modelPlayer.bipedLeftArm.rotateAngleX += rot;
 				modelPlayer.bipedRightArm.rotateAngleX += rot * 2.75F;
+			}
+			
+			if (mc.gameSettings.thirdPersonView == 0 && player instanceof EntityPlayerSP)
+			{
+				EntityPlayerSP playerSP = (EntityPlayerSP)player;
+				float strafe = playerSP.movementInput.moveStrafe;
+				
+				float div = Math.max(2, MathHelper.sqrt_float(Math.abs(modelPlayer.bipedHead.rotateAngleX * 40)));
+				float targetOffset = strafe / div;
+				prevStrafeOffset = prevStrafeOffset + (targetOffset - prevStrafeOffset) * 0.025F;
+				
+				modelPlayer.bipedLeftArm.rotateAngleZ += prevStrafeOffset;
 			}
 		}
 
