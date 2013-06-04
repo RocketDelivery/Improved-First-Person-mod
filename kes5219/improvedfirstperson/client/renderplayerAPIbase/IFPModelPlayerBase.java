@@ -1,14 +1,17 @@
 package kes5219.improvedfirstperson.client.renderplayerAPIbase;
 
 import kes5219.improvedfirstperson.client.IFPClientProxy;
+import kes5219.utils.misc.PartialTickRetriever;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBow;
+import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemStack;
 import net.minecraft.src.ModelPlayer;
 import net.minecraft.src.ModelPlayerAPI;
@@ -151,6 +154,50 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 				off = Math.abs(entity.rotationPitch / 50F * fovMult);
 				modelPlayer.bipedRightLeg.rotationPointY -= off;
 				modelPlayer.bipedLeftLeg.rotationPointY -= off;
+			}
+		}
+		
+		if (player.isUsingItem())
+		{
+			ItemStack heldItemStack = player.getHeldItem();
+			
+			if (heldItemStack != null)
+			{
+				Item heldItem = heldItemStack.getItem();
+				EnumAction action = heldItem.getItemUseAction(heldItemStack);
+				
+				if (action == EnumAction.eat || action == EnumAction.drink)
+				{
+					float partialTick = PartialTickRetriever.getPartialTick();
+					float useTime = player.getItemInUseDuration() + partialTick;
+					float moveAmount = Math.min(1, useTime / 4);
+					
+					modelPlayer.bipedRightArm.rotateAngleX -= moveAmount * 1.25F;
+					modelPlayer.bipedRightArm.rotateAngleY -= moveAmount / 2;
+					modelPlayer.bipedRightArm.rotateAngleZ += moveAmount / 2;
+
+					float bodyYaw = player.prevRenderYawOffset + (player.renderYawOffset - player.prevRenderYawOffset) * partialTick;
+					float headYaw = player.prevRotationYawHead + (player.rotationYawHead - player.prevRotationYawHead) * partialTick;
+					float offset = (headYaw - bodyYaw) / 60;
+
+					modelPlayer.bipedRightArm.rotateAngleX += offset / 2.5F;
+					modelPlayer.bipedRightArm.rotateAngleY += offset + 0.2F;
+
+					modelPlayer.bipedRightArm.rotationPointZ += moveAmount;
+					modelPlayer.bipedRightArm.rotationPointZ += (offset - 0.2F) * 2;
+					
+					float headPitch = player.prevRotationPitch + (player.rotationPitch - player.prevRotationPitch) * partialTick;
+					offset = headPitch / 180;
+					
+					modelPlayer.bipedRightArm.rotateAngleY -= offset;
+					
+					if (offset > 0)
+						offset /= 1.5F;
+					
+					System.out.println(offset);
+
+					modelPlayer.bipedRightArm.rotateAngleX += offset;
+				}
 			}
 		}
 
