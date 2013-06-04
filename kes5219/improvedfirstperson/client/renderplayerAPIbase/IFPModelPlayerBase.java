@@ -26,13 +26,14 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 	@Override
 	public void beforeSetRotationAngles(float legSwing, float legYaw, float ticksExistedPartial, float headYawOffset, float pitch, float scale, Entity entity)
 	{
+		EntityPlayer player = (EntityPlayer)entity;
 		//modelPlayer.bipedRightLeg.rotationPointZ = 0.0f;
 		//modelPlayer.bipedRightLeg.rotationPointX = -2.0f;
 		//modelPlayer.bipedLeftLeg.rotationPointZ = 0.0f;
 		//modelPlayer.bipedLeftLeg.rotationPointX = 2.0f;
-		ItemStack item = ((EntityLiving)entity).getHeldItem();
+		ItemStack item = player.getHeldItem();
 
-		if(item != null && Item.itemsList[item.itemID] instanceof ItemBow) {
+		if (item != null && Item.itemsList[item.itemID] instanceof ItemBow) {
 			modelPlayer.heldItemLeft = 1;
 			modelPlayer.heldItemRight = 0;
 		}
