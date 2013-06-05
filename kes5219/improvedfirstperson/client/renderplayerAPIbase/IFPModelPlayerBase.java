@@ -88,11 +88,10 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 
 			float headAngle = modelPlayer.bipedHead.rotateAngleX * 15;
 			float rot = headAngle / 45;
-			boolean negative = rot < 0;
 
 			rot *= rot * 2.5F;
 
-			if (!negative)
+			if (headAngle > 0)
 			{
 				modelPlayer.bipedLeftArm.rotateAngleY += rot;
 
@@ -170,7 +169,8 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 				{
 					float partialTick = PartialTickRetriever.getPartialTick();
 					float useTime = player.getItemInUseDuration() + partialTick;
-					float moveAmount = Math.min(1, useTime / 4);
+					float moveAmount = Math.min(1, useTime / 5);
+					moveAmount *= moveAmount;
 					
 					modelPlayer.bipedRightArm.rotateAngleX -= moveAmount * 1.25F;
 					modelPlayer.bipedRightArm.rotateAngleY -= moveAmount / 2;
@@ -178,7 +178,7 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 
 					float bodyYaw = player.prevRenderYawOffset + (player.renderYawOffset - player.prevRenderYawOffset) * partialTick;
 					float headYaw = player.prevRotationYawHead + (player.rotationYawHead - player.prevRotationYawHead) * partialTick;
-					float offset = (headYaw - bodyYaw) / 60;
+					float offset = (headYaw - bodyYaw) / 80;
 
 					modelPlayer.bipedRightArm.rotateAngleX += offset / 2.5F;
 					modelPlayer.bipedRightArm.rotateAngleY += offset + 0.2F;
@@ -193,8 +193,6 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 					
 					if (offset > 0)
 						offset /= 1.5F;
-					
-					System.out.println(offset);
 
 					modelPlayer.bipedRightArm.rotateAngleX += offset;
 				}
