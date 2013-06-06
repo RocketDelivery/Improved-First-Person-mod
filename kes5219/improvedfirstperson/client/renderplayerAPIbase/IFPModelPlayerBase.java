@@ -126,7 +126,7 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 		}
 
 		// Make player lean over when looking down
-		if (entity.rotationPitch > 0)
+		if (entity.rotationPitch > 0 && !modelPlayer.isRiding)
 		{
 			float off;
 			float fovMult = ((mc.thePlayer != entity || mc.gameSettings.thirdPersonView > 0) ? 0.75F : (mc.gameSettings.fovSetting + 1));
@@ -168,9 +168,13 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 				if (action == EnumAction.eat || action == EnumAction.drink)
 				{
 					float partialTick = PartialTickRetriever.getPartialTick();
-					float useTime = player.getItemInUseDuration() + partialTick;
-					float moveAmount = Math.min(1, useTime / 5);
-					moveAmount *= moveAmount;
+					
+                    float useLeftPartial = (float)player.getItemInUseCount() + 1 - partialTick;
+                    float progress = useLeftPartial / (float)heldItemStack.getMaxItemUseDuration();
+                    float moveAmount = progress * progress * progress;
+                    moveAmount = moveAmount * moveAmount * moveAmount;
+                    moveAmount = moveAmount * moveAmount * moveAmount;
+                    moveAmount = 1.0F - moveAmount;
 					
 					modelPlayer.bipedRightArm.rotateAngleX -= moveAmount * 1.25F;
 					modelPlayer.bipedRightArm.rotateAngleY -= moveAmount / 2;
@@ -178,7 +182,7 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 
 					float bodyYaw = player.prevRenderYawOffset + (player.renderYawOffset - player.prevRenderYawOffset) * partialTick;
 					float headYaw = player.prevRotationYawHead + (player.rotationYawHead - player.prevRotationYawHead) * partialTick;
-					float offset = (headYaw - bodyYaw) / 80;
+					float offset = (headYaw - bodyYaw) / 80 * moveAmount;
 
 					modelPlayer.bipedRightArm.rotateAngleX += offset / 2.5F;
 					modelPlayer.bipedRightArm.rotateAngleY += offset + 0.2F;
