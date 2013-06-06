@@ -20,6 +20,7 @@ import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBow;
+import net.minecraft.item.ItemCarrotOnAStick;
 import net.minecraft.item.ItemStack;
 import net.minecraft.src.RenderPlayerAPI;
 import net.minecraft.src.RenderPlayerBase;
@@ -89,8 +90,6 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 
 			if (arrowList == null || arrowList.size() != arrowCount)
 				arrowList = new ArrayList();
-
-			RenderHelper.disableStandardItemLighting();
 
 			for (int arrowIndex = 0; arrowIndex < arrowCount; ++arrowIndex)
 			{
@@ -175,7 +174,6 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 			}
 
 			arrowCache.put(entity.entityId, arrowList);
-			RenderHelper.enableStandardItemLighting();
 		}
 	}
 
@@ -185,7 +183,10 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 
 	@Override
 	public void afterPositionSpecialItemInHand(EntityPlayer player, float partialTick, EnumAction useAction, ItemStack heldStack) {
-		//renders bow on player's left hand
+		if (player == IFPClientProxy.mc.thePlayer && IFPClientProxy.mc.gameSettings.thirdPersonView == 0)
+			RenderHelper.enableStandardItemLighting();
+
+		//render bow on player's left hand
 		if (Item.itemsList[heldStack.itemID] instanceof ItemBow) {
 			GL11.glPopMatrix();
 			GL11.glPushMatrix();
@@ -242,7 +243,7 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 		{
 			Item heldItem = player.getHeldItem().getItem();
 
-			if (heldItem.isFull3D())
+			if (heldItem.isFull3D() && !(heldItem instanceof ItemCarrotOnAStick))
 			{
 				float actualSwing = player.getSwingProgress(partialTick);
 				float rot = actualSwing * swingRotation + swingRotationWindup;
