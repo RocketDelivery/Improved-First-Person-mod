@@ -11,6 +11,7 @@ import kes5219.utils.misc.PartialTickRetriever;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
+import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
@@ -49,10 +50,18 @@ public class AfterCameraTransformation {
 		        
 				GL11.glLoadIdentity();
 				displayOverlayEffects(partialTick);
+		        
+		        if (mc.gameSettings.anaglyph)
+		        {
+		            GL11.glTranslatef((float)(-(EntityRenderer.anaglyphField * 2 - 1)) * 0.07F, 0.0F, 0.0F);
+		            GL11.glTranslatef((float)(EntityRenderer.anaglyphField * 2 - 1) * 0.1F, 0.0F, 0.0F);
+		        }
+		        
 				GL11.glTranslatef(0.0f, -EYE_OFFSET_HEIGHT, 0.0f);
 		        GL11.glRotatef(player.prevRotationPitch + (player.rotationPitch - player.prevRotationPitch) * partialTick, 1.0F, 0.0F, 0.0F);
 		        GL11.glTranslatef(0.0f, 0.0625f, EYE_OFFSET);
 		        GL11.glRotatef(player.prevRotationYaw + (player.rotationYaw - player.prevRotationYaw) * partialTick + 180.0F, 0.0F, 1.0F, 0.0F);
+		        
 		        ActiveRenderInfo.updateRenderInfo(mc.thePlayer, mc.gameSettings.thirdPersonView == 2);
 	
 				double xOffset = player.posX + ActiveRenderInfo.objectX;
