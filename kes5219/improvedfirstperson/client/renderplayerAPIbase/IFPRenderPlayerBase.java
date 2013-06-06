@@ -79,101 +79,108 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 	@Override
 	public void renderArrowsStuckInEntity(EntityLiving entity, float partialTick)
 	{
-		int arrowCount = entity.getArrowCountInEntity();
-
-		if (arrowCount > 0)
+		if (entity == IFPClientProxy.mc.thePlayer)
 		{
-			EntityArrow arrow = new EntityArrow(entity.worldObj, entity.posX, entity.posY, entity.posZ);
-			Random random = null;
-
-			ArrayList<ArrowPosition> arrowList = arrowCache.get(entity.entityId);
-
-			if (arrowList == null || arrowList.size() != arrowCount)
-				arrowList = new ArrayList();
-
-			for (int arrowIndex = 0; arrowIndex < arrowCount; ++arrowIndex)
+			int arrowCount = entity.getArrowCountInEntity();
+	
+			if (arrowCount > 0)
 			{
-				GL11.glPushMatrix();
-
-				ModelRenderer modelRenderer = null;
-				ModelBox box = null;
-
-				// Translation
-				float randX = 0;
-				float randY = 0;
-				float randZ = 0;
-				float arrowX = 0;
-				float arrowY = 0;
-				float arrowZ = 0;
-
-				if (arrowList.size() == arrowCount)
+				EntityArrow arrow = new EntityArrow(entity.worldObj, entity.posX, entity.posY, entity.posZ);
+				Random random = null;
+	
+				ArrayList<ArrowPosition> arrowList = arrowCache.get(entity.entityId);
+	
+				if (arrowList == null || arrowList.size() != arrowCount)
+					arrowList = new ArrayList();
+	
+				for (int arrowIndex = 0; arrowIndex < arrowCount; ++arrowIndex)
 				{
-					ArrowPosition arrowPos = arrowList.get(arrowIndex);
-
-					if (arrowPos != null)
+					GL11.glPushMatrix();
+	
+					ModelRenderer modelRenderer = null;
+					ModelBox box = null;
+	
+					// Translation
+					float randX = 0;
+					float randY = 0;
+					float randZ = 0;
+					float arrowX = 0;
+					float arrowY = 0;
+					float arrowZ = 0;
+	
+					if (arrowList.size() == arrowCount)
 					{
-						modelRenderer = arrowPos.modelRenderer;
-						randX = arrowPos.randX;
-						randY = arrowPos.randY;
-						randZ = arrowPos.randZ;
-						arrowX = arrowPos.arrowX;
+						ArrowPosition arrowPos = arrowList.get(arrowIndex);
+	
+						if (arrowPos != null)
+						{
+							modelRenderer = arrowPos.modelRenderer;
+							randX = arrowPos.randX;
+							randY = arrowPos.randY;
+							randZ = arrowPos.randZ;
+							arrowX = arrowPos.arrowX;
+						}
 					}
-				}
-
-				if (modelRenderer == null)
-				{
-					AxisAlignedBB headBB = AxisAlignedBB.getAABBPool().getAABB(-0.4F, -0.8F, -0.4F, 0.4F, 0.2F, 0.4F);
-
-					if (random == null)
-						random = new Random(entity.entityId);
-
-					int tries = 0;
-
-					while (tries < 10 && (modelRenderer == null ||
-							(entity == IFPClientProxy.mc.renderViewEntity &&
-							headBB.isVecInside(entity.worldObj.getWorldVec3Pool().getVecFromPool(arrowX, arrowY, arrowZ)))))
+	
+					if (modelRenderer == null)
 					{
-						modelRenderer = renderPlayer.getMainModelField().getRandomModelBox(random);
-						box = (ModelBox)modelRenderer.cubeList.get(random.nextInt(modelRenderer.cubeList.size()));
-
-						randX = random.nextFloat();
-						randY = random.nextFloat();
-						randZ = random.nextFloat();
-
-						arrowX = (box.posX1 + (box.posX2 - box.posX1) * randX) / 16.0F;
-						arrowY = (box.posY1 + (box.posY2 - box.posY1) * randY) / 16.0F;
-						arrowZ = (box.posZ1 + (box.posZ2 - box.posZ1) * randZ) / 16.0F;
-
-						tries++;
+						AxisAlignedBB headBB = AxisAlignedBB.getAABBPool().getAABB(-0.4F, -0.8F, -0.4F, 0.4F, 0.2F, 0.4F);
+	
+						if (random == null)
+							random = new Random(entity.entityId);
+	
+						int tries = 0;
+	
+						while (tries < 10 && (modelRenderer == null ||
+								(entity == IFPClientProxy.mc.renderViewEntity &&
+								headBB.isVecInside(entity.worldObj.getWorldVec3Pool().getVecFromPool(arrowX, arrowY, arrowZ)))))
+						{
+							modelRenderer = renderPlayer.getMainModelField().getRandomModelBox(random);
+							box = (ModelBox)modelRenderer.cubeList.get(random.nextInt(modelRenderer.cubeList.size()));
+	
+							randX = random.nextFloat();
+							randY = random.nextFloat();
+							randZ = random.nextFloat();
+	
+							arrowX = (box.posX1 + (box.posX2 - box.posX1) * randX) / 16.0F;
+							arrowY = (box.posY1 + (box.posY2 - box.posY1) * randY) / 16.0F;
+							arrowZ = (box.posZ1 + (box.posZ2 - box.posZ1) * randZ) / 16.0F;
+	
+							tries++;
+						}
+	
+						arrowList.add(new ArrowPosition(modelRenderer,
+								randX, randY, randZ,
+								arrowX, arrowY, arrowZ));
 					}
-
-					arrowList.add(new ArrowPosition(modelRenderer,
-							randX, randY, randZ,
-							arrowX, arrowY, arrowZ));
+	
+					modelRenderer.postRender(0.0625F);
+	
+					GL11.glTranslatef(arrowX, arrowY, arrowZ);
+	
+					// Rotation
+					randX = randX * 2.0F - 1.0F;
+					randY = randY * 2.0F - 1.0F;
+					randZ = randZ * 2.0F - 1.0F;
+					randX *= -1.0F;
+					randY *= -1.0F;
+					randZ *= -1.0F;
+					float dist = MathHelper.sqrt_float(randX * randX + randZ * randZ);
+					arrow.prevRotationYaw = arrow.rotationYaw = (float)(Math.atan2(randX, randZ) * 180.0D / Math.PI);
+					arrow.prevRotationPitch = arrow.rotationPitch = (float)(Math.atan2(randY, dist) * 180.0D / Math.PI);
+	
+					// Render
+					renderPlayer.getRenderManagerField().renderEntityWithPosYaw(arrow, 0, 0, 0, 0, partialTick);
+	
+					GL11.glPopMatrix();
 				}
-
-				modelRenderer.postRender(0.0625F);
-
-				GL11.glTranslatef(arrowX, arrowY, arrowZ);
-
-				// Rotation
-				randX = randX * 2.0F - 1.0F;
-				randY = randY * 2.0F - 1.0F;
-				randZ = randZ * 2.0F - 1.0F;
-				randX *= -1.0F;
-				randY *= -1.0F;
-				randZ *= -1.0F;
-				float dist = MathHelper.sqrt_float(randX * randX + randZ * randZ);
-				arrow.prevRotationYaw = arrow.rotationYaw = (float)(Math.atan2(randX, randZ) * 180.0D / Math.PI);
-				arrow.prevRotationPitch = arrow.rotationPitch = (float)(Math.atan2(randY, dist) * 180.0D / Math.PI);
-
-				// Render
-				renderPlayer.getRenderManagerField().renderEntityWithPosYaw(arrow, 0, 0, 0, 0, partialTick);
-
-				GL11.glPopMatrix();
+	
+				arrowCache.put(entity.entityId, arrowList);
 			}
-
-			arrowCache.put(entity.entityId, arrowList);
+		}
+		else
+		{
+			renderPlayer.localRenderArrowsStuckInEntity(entity, partialTick);
 		}
 	}
 
