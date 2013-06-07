@@ -12,6 +12,8 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemFood;
+import net.minecraft.item.ItemMap;
+import net.minecraft.item.ItemMapBase;
 import net.minecraft.item.ItemStack;
 import net.minecraft.src.ModelPlayer;
 import net.minecraft.src.ModelPlayerAPI;
@@ -46,6 +48,7 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 	public void afterSetRotationAngles(float legSwing, float legYaw, float ticksExistedPartial, float headYawOffset, float pitch, float scale, Entity entity) {
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayer player = (EntityPlayer)entity;
+		float partialTick = PartialTickRetriever.getPartialTick();
 
 		if (RenderManager.instance.playerViewY == 180.0f) {
 			//if the inventory screen is open
@@ -77,13 +80,14 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 		}
 
 		if (modelPlayer.aimedBow) {
-			player.renderYawOffset = player.rotationYawHead + 40;
+			float rotationYaw = player.prevRotationYawHead + (player.rotationYawHead - player.prevRotationYawHead) * partialTick; 
+			player.renderYawOffset = rotationYaw + 40;
 			modelPlayer.bipedLeftArm.rotateAngleY += 0.15F;
 
 			ticksExistedPartial = ticksExistedPartial * 6.0f;
-			modelPlayer.bipedRightArm.rotateAngleZ += 0.15F * (MathHelper.cos(ticksExistedPartial * 0.09F) * 0.05F + 0.05F);
+			//modelPlayer.bipedRightArm.rotateAngleZ += 0.15F * (MathHelper.cos(ticksExistedPartial * 0.09F) * 0.05F + 0.05F);
 			modelPlayer.bipedLeftArm.rotateAngleZ -= 0.15F * (MathHelper.cos(ticksExistedPartial * 0.09F) * 0.05F + 0.05F);
-			modelPlayer.bipedRightArm.rotateAngleX += 0.15F * (MathHelper.sin(ticksExistedPartial * 0.067F) * 0.05F);
+			//modelPlayer.bipedRightArm.rotateAngleX += 0.15F * (MathHelper.sin(ticksExistedPartial * 0.067F) * 0.05F);
 			modelPlayer.bipedLeftArm.rotateAngleX -= 0.15F * (MathHelper.sin(ticksExistedPartial * 0.067F) * 0.05F);
 
 			float headAngle = modelPlayer.bipedHead.rotateAngleX * 15;
@@ -133,8 +137,11 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 
 			if (fovMult > 1.75F)
 				fovMult = 1.75F;
+			
+			ItemStack heldItem = player.getHeldItem();
+			boolean map = heldItem != null && (heldItem.getItem() instanceof ItemMapBase);
 
-			if (!player.isUsingItem())
+			if (!player.isUsingItem() && !map)
 			{
 				off = Math.abs(entity.rotationPitch / 250F * fovMult);
 				modelPlayer.bipedLeftArm.rotateAngleZ -= off;
@@ -167,8 +174,6 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 				
 				if (action == EnumAction.eat || action == EnumAction.drink)
 				{
-					float partialTick = PartialTickRetriever.getPartialTick();
-					
                     float useLeftPartial = (float)player.getItemInUseCount() + 1 - partialTick;
                     float progress = useLeftPartial / (float)heldItemStack.getMaxItemUseDuration();
                     float moveAmount = progress * progress * progress;
