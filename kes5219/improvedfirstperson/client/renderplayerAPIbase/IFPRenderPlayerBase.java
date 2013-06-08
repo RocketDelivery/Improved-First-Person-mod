@@ -13,6 +13,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
@@ -26,6 +27,7 @@ import net.minecraft.src.RenderPlayerAPI;
 import net.minecraft.src.RenderPlayerBase;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
+import net.minecraftforge.client.MinecraftForgeClient;
 
 public class IFPRenderPlayerBase extends RenderPlayerBase {
 	public IFPRenderPlayerBase(RenderPlayerAPI renderPlayerAPI) {
@@ -79,6 +81,9 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 	@Override
 	public void renderArrowsStuckInEntity(EntityLiving entity, float partialTick)
 	{
+		if (MinecraftForgeClient.getRenderPass() != 0)
+			return;
+		
 		if (entity == IFPClientProxy.mc.thePlayer)
 		{
 			int arrowCount = entity.getArrowCountInEntity();
@@ -124,8 +129,8 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 	
 					if (modelRenderer == null)
 					{
-						AxisAlignedBB headBB = AxisAlignedBB.getAABBPool().getAABB(-0.4F, -0.8F, -0.4F, 0.4F, 0.2F, 0.4F);
-	
+						AxisAlignedBB headBB = AxisAlignedBB.getAABBPool().getAABB(-0.6F, -0.8F, -0.6F, 0.6F, 0.3F, 0.6F);
+						
 						if (random == null)
 							random = new Random(entity.entityId);
 	

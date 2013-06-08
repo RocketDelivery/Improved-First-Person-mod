@@ -6,6 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.src.ModLoader;
+import net.minecraftforge.client.MinecraftForgeClient;
 import kes5219.improvedfirstperson.client.IFPClientProxy;
 import kes5219.improvedfirstperson.common.ModImprovedFirstPerson;
 import kes5219.utils.misc.PartialTickRetriever;
@@ -22,7 +23,8 @@ public class RenderEntityHook {
 		
 		if (ModImprovedFirstPerson.enableBodyRender &&
 				mc.gameSettings.thirdPersonView == 0 &&
-				!mc.thePlayer.isPlayerSleeping()) {
+				!mc.thePlayer.isPlayerSleeping() &&
+				MinecraftForgeClient.getRenderPass() == 0) {
 			RenderManager.instance.renderEntity(IFPClientProxy.mc.renderViewEntity, PartialTickRetriever.getPartialTick());
 		}
 	}
