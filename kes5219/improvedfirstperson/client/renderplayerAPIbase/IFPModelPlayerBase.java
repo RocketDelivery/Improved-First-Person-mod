@@ -141,9 +141,13 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 			ItemStack heldItem = player.getHeldItem();
 			boolean map = heldItem != null && (heldItem.getItem() instanceof ItemMapBase);
 
-			if (!player.isUsingItem() && !map)
+			if (!map)
 			{
 				off = Math.abs(entity.rotationPitch / 250F * fovMult);
+				
+				if (player.isUsingItem())
+					off /= ((player.getItemInUseDuration() + partialTick) / 4) + 1;
+				
 				modelPlayer.bipedLeftArm.rotateAngleZ -= off;
 				modelPlayer.bipedRightArm.rotateAngleZ += off;
 			}
