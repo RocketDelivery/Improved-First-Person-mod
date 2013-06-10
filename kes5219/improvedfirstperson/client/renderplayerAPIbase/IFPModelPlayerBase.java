@@ -146,7 +146,14 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 				off = Math.abs(entity.rotationPitch / 250F * fovMult);
 				
 				if (player.isUsingItem())
-					off /= ((player.getItemInUseDuration() + partialTick) / 4) + 1;
+				{
+					float div = ((player.getItemInUseDuration() + partialTick) / 4) + 1;
+					
+					if (div < 1)
+						div = 1;
+					
+					off /= div;
+				}
 				
 				modelPlayer.bipedLeftArm.rotateAngleZ -= off;
 				modelPlayer.bipedRightArm.rotateAngleZ += off;
