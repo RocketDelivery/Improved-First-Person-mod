@@ -33,8 +33,8 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import kes5219.improvedfirstperson.common.ModImprovedFirstPerson;
 import kes5219.improvedfirstperson.hooks.CrosshairRenderHook;
-import kes5219.utils.classtransformer.helper.ClassTransformHelper;
-import kes5219.utils.classtransformer.helper.CustomMethodTransformer;
+import kes5219.utils.classtransformhelper.ClassTransformHelper;
+import kes5219.utils.classtransformhelper.CustomMethodTransformer;
 
 import cpw.mods.fml.common.asm.transformers.AccessTransformer;
 import cpw.mods.fml.relauncher.IClassTransformer;
