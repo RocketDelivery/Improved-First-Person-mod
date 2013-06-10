@@ -81,9 +81,6 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 	@Override
 	public void renderArrowsStuckInEntity(EntityLiving entity, float partialTick)
 	{
-		if (MinecraftForgeClient.getRenderPass() != 0)
-			return;
-		
 		if (entity == IFPClientProxy.mc.thePlayer)
 		{
 			int arrowCount = entity.getArrowCountInEntity();

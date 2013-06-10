@@ -24,7 +24,7 @@ public class RenderEntityHook {
 		if (ModImprovedFirstPerson.enableBodyRender &&
 				mc.gameSettings.thirdPersonView == 0 &&
 				!mc.thePlayer.isPlayerSleeping() &&
-				MinecraftForgeClient.getRenderPass() == 0) {
+				mc.renderViewEntity.shouldRenderInPass(MinecraftForgeClient.getRenderPass())) {
 			RenderManager.instance.renderEntity(IFPClientProxy.mc.renderViewEntity, PartialTickRetriever.getPartialTick());
 		}
 	}
