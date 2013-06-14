@@ -36,7 +36,7 @@ import cpw.mods.fml.common.event.FMLServerStoppingEvent;
 import cpw.mods.fml.common.network.NetworkMod;
 import cpw.mods.fml.common.registry.TickRegistry;
 
-@Mod(modid = "kes5219_improvedfirstperson", name = "Improved First Person View Mod", version = "1.5.2_r1")
+@Mod(modid = "kes5219_improvedfirstperson", name = "Improved First Person View Mod", version = "1.5.2_r2")
 @NetworkMod(clientSideRequired = true, serverSideRequired = false)
 public class ModImprovedFirstPerson
 {
