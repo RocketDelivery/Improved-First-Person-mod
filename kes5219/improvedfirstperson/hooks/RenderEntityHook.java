@@ -5,6 +5,8 @@ import java.lang.reflect.InvocationTargetException;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.ModelRenderer;
+import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.src.ModLoader;
@@ -30,22 +32,38 @@ public class RenderEntityHook {
 				mc.renderViewEntity.shouldRenderInPass(MinecraftForgeClient.getRenderPass())) {
 			if (IFPClientProxy.animPlayerDetected) {		
 				try {
+					//The reason why this if statement is here instead of postInit in IFPClientProxy
+					//is that Animated Player mod registers its own player renderer in postInit process.
+					if(AnimPlayerCompatHelper.playerRenderer == null) {
+						AnimPlayerCompatHelper.playerRenderer = (Render)RenderManager.instance.entityRenderMap.get(EntityPlayer.class);
+					}
+					
 					Object playerData = AnimPlayerCompatHelper.methodGetPlayerData.invoke(null, (Object)IFPClientProxy.mc.renderViewEntity);
 					Object texInfo = AnimPlayerCompatHelper.fieldTextureInfo.get(playerData);
+					Object modelPlayer = AnimPlayerCompatHelper.fieldPlayerModel.get(AnimPlayerCompatHelper.playerRenderer);
 					
 					boolean animEyes = AnimPlayerCompatHelper.fieldAnimateEyes.getBoolean(texInfo);
 					boolean animEyebrows = AnimPlayerCompatHelper.fieldAnimateEyebrows.getBoolean(texInfo);
 					boolean animMouth = AnimPlayerCompatHelper.fieldAnimateMouth.getBoolean(texInfo);
 					
+					ModelRenderer rendererHead = (ModelRenderer)AnimPlayerCompatHelper.fieldHead.get(modelPlayer);
+					ModelRenderer rendererHeadwear = (ModelRenderer)AnimPlayerCompatHelper.fieldHeadwear.get(modelPlayer);
+					boolean renderHead = rendererHead.showModel;
+					boolean renderHeadwear = rendererHeadwear.showModel;
+					
 					if(animEyes) AnimPlayerCompatHelper.fieldAnimateEyes.setBoolean(texInfo, false);
 					if(animEyebrows) AnimPlayerCompatHelper.fieldAnimateEyebrows.setBoolean(texInfo, false);
 					if(animMouth) AnimPlayerCompatHelper.fieldAnimateMouth.setBoolean(texInfo, false);
-					
+					if(renderHead) rendererHead.showModel = false;
+					if(renderHeadwear) rendererHeadwear.showModel = false;
+
 					RenderManager.instance.renderEntity(IFPClientProxy.mc.renderViewEntity, PartialTickRetriever.getPartialTick());
 
 					if(animEyes) AnimPlayerCompatHelper.fieldAnimateEyes.setBoolean(texInfo, true);
 					if(animEyebrows) AnimPlayerCompatHelper.fieldAnimateEyebrows.setBoolean(texInfo, true);
 					if(animMouth) AnimPlayerCompatHelper.fieldAnimateMouth.setBoolean(texInfo, true);
+					if(renderHead) rendererHead.showModel = true;
+					if(renderHeadwear) rendererHeadwear.showModel = true;
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 					IFPClientProxy.animPlayerDetected = false;
@@ -53,6 +71,9 @@ public class RenderEntityHook {
 					e.printStackTrace();
 					IFPClientProxy.animPlayerDetected = false;
 				} catch (InvocationTargetException e) {
+					e.printStackTrace();
+					IFPClientProxy.animPlayerDetected = false;
+				} catch (ClassCastException e) {
 					e.printStackTrace();
 					IFPClientProxy.animPlayerDetected = false;
 				}

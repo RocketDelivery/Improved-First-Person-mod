@@ -12,6 +12,8 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.src.ModelPlayerAPI;
@@ -58,6 +60,13 @@ public class IFPClientProxy extends IFPCommonProxy {
 				AnimPlayerCompatHelper.fieldAnimateEyes = AnimPlayerCompatHelper.classTextureInfo.getField("animateEyes");
 				AnimPlayerCompatHelper.fieldAnimateMouth = AnimPlayerCompatHelper.classTextureInfo.getField("animateMouth");
 				
+				AnimPlayerCompatHelper.classRenderPlayer = Class.forName("mods.AnimatedPlayer.client.RenderPlayer");
+				AnimPlayerCompatHelper.fieldPlayerModel = AnimPlayerCompatHelper.classRenderPlayer.getField("playerModel");
+				
+				AnimPlayerCompatHelper.classModelPlayer = Class.forName("mods.AnimatedPlayer.client.ModelPlayer");
+				AnimPlayerCompatHelper.fieldHead = AnimPlayerCompatHelper.classModelPlayer.getField("head");
+				AnimPlayerCompatHelper.fieldHeadwear = AnimPlayerCompatHelper.classModelPlayer.getField("headwear");
+				
 				System.out.println("Improved First Person Mod: Animated Player mod successfully identified. Enabling compatibility with Animated Players mod.");
 				success = true;
 			} 
@@ -79,7 +88,6 @@ public class IFPClientProxy extends IFPCommonProxy {
 				e.printStackTrace();
 				success = false;
 			}
-			
 			animPlayerDetected = success;
 		}
 	}
