@@ -42,6 +42,11 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 			modelPlayer.heldItemLeft = 1;
 			modelPlayer.heldItemRight = 0;
 		}
+		
+		if(IFPClientProxy.animPlayerDetected)
+		{
+			System.out.println("animated player detected");
+		}
 	}
 
 	@Override

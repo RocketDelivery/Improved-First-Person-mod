@@ -45,6 +45,6 @@ public class IFPClientProxy extends IFPCommonProxy {
 	}
 	
 	public void postInit(FMLPostInitializationEvent event) {
-		animPlayerDetected = Loader.isModLoaded("Animated Player Mod");
+		animPlayerDetected = Loader.isModLoaded("AnimatedPlayer");
 	}
 }
