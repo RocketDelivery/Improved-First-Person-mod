@@ -5,7 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
+import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -26,6 +28,7 @@ public class IFPClientProxy extends IFPCommonProxy {
 	
 	private static final int EMPTYMAPITEMID = 395;
 	public static Minecraft mc;
+	public static boolean animPlayerDetected;
 	
 	public void preInit(FMLPreInitializationEvent event) {
 		mc = Minecraft.getMinecraft();
@@ -39,5 +42,9 @@ public class IFPClientProxy extends IFPCommonProxy {
 		//AfterCameraTransformation.init();
 		MinecraftForgeClient.registerItemRenderer(Item.map.itemID, new FirstPersonMapRenderer());
 		MinecraftForgeClient.registerItemRenderer(EMPTYMAPITEMID, new FirstPersonMapRenderer());		
+	}
+	
+	public void postInit(FMLPostInitializationEvent event) {
+		animPlayerDetected = Loader.isModLoaded("Animated Player Mod");
 	}
 }
