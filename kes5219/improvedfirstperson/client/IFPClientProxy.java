@@ -12,6 +12,7 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.src.ModelPlayerAPI;
 import net.minecraft.src.RenderPlayerAPI;
@@ -45,6 +46,41 @@ public class IFPClientProxy extends IFPCommonProxy {
 	}
 	
 	public void postInit(FMLPostInitializationEvent event) {
-		animPlayerDetected = Loader.isModLoaded("AnimatedPlayer");
+		if(Loader.isModLoaded("AnimatedPlayer")) {
+			boolean success = false;
+			try {
+				AnimPlayerCompatHelper.classPlayerData = Class.forName("mods.AnimatedPlayer.PlayerData");
+				AnimPlayerCompatHelper.methodGetPlayerData = AnimPlayerCompatHelper.classPlayerData.getMethod("getPlayerData", EntityPlayer.class);
+				AnimPlayerCompatHelper.fieldTextureInfo = AnimPlayerCompatHelper.classPlayerData.getField("textureInfo");				
+				
+				AnimPlayerCompatHelper.classTextureInfo = Class.forName("mods.AnimatedPlayer.PlayerData$TextureInfo");
+				AnimPlayerCompatHelper.fieldAnimateEyebrows = AnimPlayerCompatHelper.classTextureInfo.getField("animateEyebrows");
+				AnimPlayerCompatHelper.fieldAnimateEyes = AnimPlayerCompatHelper.classTextureInfo.getField("animateEyes");
+				AnimPlayerCompatHelper.fieldAnimateMouth = AnimPlayerCompatHelper.classTextureInfo.getField("animateMouth");
+				
+				System.out.println("Improved First Person Mod: Animated Player mod successfully identified. Enabling compatibility with Animated Players mod.");
+				success = true;
+			} 
+			//Forge says that the mod is loaded, but the class files couldn't be found.
+			//Most likely because name of the classes and methods have been changed.
+			catch (ClassNotFoundException e) {
+				e.printStackTrace();
+				success = false;
+			} 
+			catch (NoSuchMethodException e) {
+				e.printStackTrace();
+				success = false;
+			}
+			catch (NoSuchFieldException e) {
+				e.printStackTrace();
+				success = false;
+			}
+			catch (SecurityException e) {
+				e.printStackTrace();
+				success = false;
+			}
+			
+			animPlayerDetected = success;
+		}
 	}
 }
