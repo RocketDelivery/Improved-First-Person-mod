@@ -3,9 +3,12 @@ package kes5219.improvedfirstperson.client;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.EnumSet;
 
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
+import cpw.mods.fml.common.ITickHandler;
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.TickType;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -20,18 +23,21 @@ import net.minecraft.src.ModelPlayerAPI;
 import net.minecraft.src.RenderPlayerAPI;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.MinecraftForge;
 import kes5219.improvedfirstperson.client.renderplayerAPIbase.IFPModelPlayerBase;
 import kes5219.improvedfirstperson.client.renderplayerAPIbase.IFPRenderPlayerBase;
 import kes5219.improvedfirstperson.common.IFPCommonProxy;
+import kes5219.improvedfirstperson.common.ModImprovedFirstPerson;
 import kes5219.improvedfirstperson.hooks.AfterCameraTransformation;
 import kes5219.utils.misc.ObjLoader;
 import kes5219.utils.misc.PartialTickRetriever;
 
-public class IFPClientProxy extends IFPCommonProxy {
+public class IFPClientProxy extends IFPCommonProxy implements ITickHandler {
 	
 	private static final int EMPTYMAPITEMID = 395;
 	public static Minecraft mc;
 	public static boolean animPlayerDetected;
+	private boolean displayMessage = true;
 	
 	public void preInit(FMLPreInitializationEvent event) {
 		mc = Minecraft.getMinecraft();
@@ -44,7 +50,8 @@ public class IFPClientProxy extends IFPCommonProxy {
 	public void init(FMLInitializationEvent event) {
 		//AfterCameraTransformation.init();
 		MinecraftForgeClient.registerItemRenderer(Item.map.itemID, new FirstPersonMapRenderer());
-		MinecraftForgeClient.registerItemRenderer(EMPTYMAPITEMID, new FirstPersonMapRenderer());		
+		MinecraftForgeClient.registerItemRenderer(EMPTYMAPITEMID, new FirstPersonMapRenderer());
+		TickRegistry.registerTickHandler(this, Side.CLIENT);
 	}
 	
 	public void postInit(FMLPostInitializationEvent event) {
@@ -71,7 +78,7 @@ public class IFPClientProxy extends IFPCommonProxy {
 				success = true;
 			} 
 			//Forge says that the mod is loaded, but the class files couldn't be found.
-			//Most likely because name of the classes and methods have been changed.
+			//Most likely because names of the classes and methods have been changed.
 			catch (ClassNotFoundException e) {
 				e.printStackTrace();
 				success = false;
@@ -90,5 +97,28 @@ public class IFPClientProxy extends IFPCommonProxy {
 			}
 			animPlayerDetected = success;
 		}
+	}
+	
+	@Override
+	public void tickStart(EnumSet<TickType> type, Object... tickData) {}
+
+	@Override
+	public void tickEnd(EnumSet<TickType> type, Object... tickData) {
+		if(displayMessage && animPlayerDetected && ModImprovedFirstPerson.enableBodyRender && mc.theWorld != null)
+		{
+			mc.ingameGUI.getChatGUI().printChatMessage("[Improved First Person mod] Improved First Person mod has been disabled because incompatibility with Animated Player mod was detected. Use \"Toggle IFP view\" keybind (Default: F6) to force to enable it");
+			ModImprovedFirstPerson.enableBodyRender = false;
+			displayMessage = false;
+		} else if(mc.theWorld == null) displayMessage = true;
+	}
+
+	@Override
+	public EnumSet<TickType> ticks() {
+		return EnumSet.of(TickType.CLIENT, TickType.WORLD);
+	}
+
+	@Override
+	public String getLabel() {
+		return null;
 	}
 }
