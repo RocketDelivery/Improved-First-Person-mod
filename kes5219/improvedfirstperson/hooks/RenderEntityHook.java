@@ -41,6 +41,7 @@ public class RenderEntityHook {
 					Object playerData = AnimPlayerCompatHelper.methodGetPlayerData.invoke(null, (Object)IFPClientProxy.mc.renderViewEntity);
 					Object texInfo = AnimPlayerCompatHelper.fieldTextureInfo.get(playerData);
 					Object modelPlayer = AnimPlayerCompatHelper.fieldPlayerModel.get(AnimPlayerCompatHelper.playerRenderer);
+					Object modelArmorHead = AnimPlayerCompatHelper.fieldPlayerArmorHeadModel.get(AnimPlayerCompatHelper.playerRenderer);
 					
 					boolean animEyes = AnimPlayerCompatHelper.fieldAnimateEyes.getBoolean(texInfo);
 					boolean animEyebrows = AnimPlayerCompatHelper.fieldAnimateEyebrows.getBoolean(texInfo);
@@ -48,15 +49,19 @@ public class RenderEntityHook {
 					
 					ModelRenderer rendererHead = (ModelRenderer)AnimPlayerCompatHelper.fieldHead.get(modelPlayer);
 					ModelRenderer rendererHeadwear = (ModelRenderer)AnimPlayerCompatHelper.fieldHeadwear.get(modelPlayer);
+					ModelRenderer rendererArmorHeadwear = (ModelRenderer)AnimPlayerCompatHelper.fieldHeadwear.get(modelArmorHead);
+					
 					boolean renderHead = rendererHead.showModel;
 					boolean renderHeadwear = rendererHeadwear.showModel;
+					boolean renderArmorHeadwear = rendererArmorHeadwear.showModel;
 					
 					if(animEyes) AnimPlayerCompatHelper.fieldAnimateEyes.setBoolean(texInfo, false);
 					if(animEyebrows) AnimPlayerCompatHelper.fieldAnimateEyebrows.setBoolean(texInfo, false);
 					if(animMouth) AnimPlayerCompatHelper.fieldAnimateMouth.setBoolean(texInfo, false);
 					if(renderHead) rendererHead.showModel = false;
 					if(renderHeadwear) rendererHeadwear.showModel = false;
-
+					if(renderArmorHeadwear) rendererArmorHeadwear.showModel = false;
+					
 					RenderManager.instance.renderEntity(IFPClientProxy.mc.renderViewEntity, PartialTickRetriever.getPartialTick());
 
 					if(animEyes) AnimPlayerCompatHelper.fieldAnimateEyes.setBoolean(texInfo, true);
@@ -64,6 +69,7 @@ public class RenderEntityHook {
 					if(animMouth) AnimPlayerCompatHelper.fieldAnimateMouth.setBoolean(texInfo, true);
 					if(renderHead) rendererHead.showModel = true;
 					if(renderHeadwear) rendererHeadwear.showModel = true;
+					if(renderArmorHeadwear) rendererArmorHeadwear.showModel = true;
 				} catch (IllegalAccessException e) {
 					e.printStackTrace();
 					IFPClientProxy.animPlayerDetected = false;

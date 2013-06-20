@@ -19,6 +19,7 @@ public class AnimPlayerCompatHelper
 	public static Render playerRenderer;
 	public static Class classRenderPlayer;
 	public static Field fieldPlayerModel;
+	public static Field fieldPlayerArmorHeadModel;
 	
 	public static Class classModelPlayer;
 	public static Field fieldHead;

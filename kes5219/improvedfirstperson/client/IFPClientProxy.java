@@ -69,6 +69,7 @@ public class IFPClientProxy extends IFPCommonProxy implements ITickHandler {
 				
 				AnimPlayerCompatHelper.classRenderPlayer = Class.forName("mods.AnimatedPlayer.client.RenderPlayer");
 				AnimPlayerCompatHelper.fieldPlayerModel = AnimPlayerCompatHelper.classRenderPlayer.getField("playerModel");
+				AnimPlayerCompatHelper.fieldPlayerArmorHeadModel = AnimPlayerCompatHelper.classRenderPlayer.getField("playerArmorHead");
 				
 				AnimPlayerCompatHelper.classModelPlayer = Class.forName("mods.AnimatedPlayer.client.ModelPlayer");
 				AnimPlayerCompatHelper.fieldHead = AnimPlayerCompatHelper.classModelPlayer.getField("head");
