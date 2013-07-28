@@ -1,5 +1,8 @@
 package kes5219.improvedfirstperson.client.renderplayerAPIbase;
 
+import api.player.model.ModelPlayer;
+import api.player.model.ModelPlayerAPI;
+import api.player.model.ModelPlayerBase;
 import kes5219.improvedfirstperson.client.IFPClientProxy;
 import kes5219.utils.misc.PartialTickRetriever;
 import net.minecraft.client.Minecraft;
@@ -15,9 +18,6 @@ import net.minecraft.item.ItemFood;
 import net.minecraft.item.ItemMap;
 import net.minecraft.item.ItemMapBase;
 import net.minecraft.item.ItemStack;
-import net.minecraft.src.ModelPlayer;
-import net.minecraft.src.ModelPlayerAPI;
-import net.minecraft.src.ModelPlayerBase;
 import net.minecraft.util.MathHelper;
 
 public class IFPModelPlayerBase  extends ModelPlayerBase {

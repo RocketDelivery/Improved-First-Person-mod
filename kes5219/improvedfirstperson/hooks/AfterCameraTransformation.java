@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
 import net.minecraft.src.ModLoader;
@@ -123,7 +124,7 @@ public class AfterCameraTransformation {
 	public static void hurtCameraEffect(float par1)
     {
 		Minecraft mc = IFPClientProxy.mc;
-        EntityLiving var2 = mc.renderViewEntity;
+        EntityLivingBase var2 = mc.renderViewEntity;
         float var3 = (float)var2.hurtTime - par1;
         float var4;
 
@@ -158,6 +159,7 @@ public class AfterCameraTransformation {
         //mc.entityRenderer.rendererUpdateCount is private by default, but changed to public
         //during initialization using class transformer.
         int rendererUpdateCount = mc.entityRenderer.rendererUpdateCount;
+        
         if (timeInPortal > 0.0F)
         {
             byte var5 = 20;

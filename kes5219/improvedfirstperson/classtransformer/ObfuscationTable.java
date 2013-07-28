@@ -38,4 +38,12 @@ public class ObfuscationTable {
 	static String MethodRenderGameOverlay;
 	
 	static String MethodRenderGameOverlayDesc;
+
+	static String ClassItemEditableBook;
+
+	static String ClassItemWritableBook;
+
+	static String MethodOnItemRightClick;
+	
+	static String MethodOnItemRightClickDesc;
 }

@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.minecraft.client.gui.GuiIngame;
+import net.minecraft.launchwrapper.IClassTransformer;
 import net.minecraft.world.World;
 
 import org.objectweb.asm.ClassReader;
@@ -35,25 +36,39 @@ import kes5219.improvedfirstperson.common.ModImprovedFirstPerson;
 import kes5219.improvedfirstperson.hooks.CrosshairRenderHook;
 import kes5219.utils.classtransformhelper.ClassTransformHelper;
 import kes5219.utils.classtransformhelper.CustomMethodTransformer;
+import kes5219.utils.classtransformhelper.MethodTransformer;
 
 import cpw.mods.fml.common.asm.transformers.AccessTransformer;
-import cpw.mods.fml.relauncher.IClassTransformer;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
 
 
 public class ClassTransformer implements IClassTransformer {
+	
+	/*public static byte[] addMethod(
+			byte[] byteCode,
+			String addToClass,
+			String addMethodName,
+			String addMethodDesc) {
+		ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
+
+		classWriter.newMethod(addToClass, addMethodName, addMethodDesc, itf)
+		
+		ClassReader classReader = new ClassReader(byteCode);
+		classReader.accept(transformer, 0);
+		return classWriter.toByteArray();
+	}*/
 
 	//Injects codes into the base class files during initialization, making it possible to gain access to core parts
 	//of Minecraft without directly modifying the base class files.
-	 
+	
 	public byte[] transform(String name, String transformedName, byte[] bytes) {
-		if(name.equals(ObfuscationTable.ClassItemRenderer)) {
-			byte[] returnVal =  ClassTransformHelper.injectSimpleHook(bytes, true, ObfuscationTable.MethodRenderItemInFirstPerson, "(F)", "kes5219/improvedfirstperson/hooks/ItemRendererHook", "shouldRenderItemInFirstPerson");
+		if (name.equals(ObfuscationTable.ClassItemRenderer)) {
+			byte[] returnVal = ClassTransformHelper.injectSimpleHook(bytes, true, ObfuscationTable.MethodRenderItemInFirstPerson, "(F)", "kes5219/improvedfirstperson/hooks/ItemRendererHook", "shouldRenderItemInFirstPerson");
 			System.out.println("Improved First Person Mod: Successfully modified renderItemInFirstPerson in ItemRenderer");
 			return returnVal;
-		} else
-		if(name.equals(ObfuscationTable.ClassEntityRenderer)) {
-			byte[] tempByte1 =  ClassTransformHelper.changeFieldAcess(bytes, ObfuscationTable.FieldRendererUpdateCount, Opcodes.ACC_PUBLIC);
+		}
+		else if (name.equals(ObfuscationTable.ClassEntityRenderer)) {
+			byte[] tempByte1 = ClassTransformHelper.changeFieldAcess(bytes, ObfuscationTable.FieldRendererUpdateCount, Opcodes.ACC_PUBLIC);
 			System.out.println("Improved First Person Mod: Successfully changed the field rendererUpdateCount to public in EntityRenderer");
 						
 			byte[] tempByte2 = ClassTransformHelper.injectSimpleHookAtProfilerSection(tempByte1, ObfuscationTable.MethodRenderWorld, ObfuscationTable.MethodRenderWorldDesc, "kes5219/improvedfirstperson/hooks/AfterCameraTransformation", "afterCameraTransform", "frustrum");
@@ -62,16 +77,29 @@ public class ClassTransformer implements IClassTransformer {
 			byte[] tempByte3 = ClassTransformHelper.injectCustomHook(tempByte2, new MethodGetMouseOverTransformer(), ObfuscationTable.MethodGetMouseOver, ObfuscationTable.MethodGetMouseOverDesc);
 			System.out.println("Improved First Person Mod: Successfully injected hook into getMouseOver in EntityRenderer");
 			return tempByte3;
-		} else
-		if(name.equals(ObfuscationTable.ClassRenderFish)) {
+		}
+		else if (name.equals(ObfuscationTable.ClassRenderFish)) {
 			byte[] returnVal = ClassTransformHelper.injectCustomHook(bytes, new MethodDoRenderFishHookTransformer(), ObfuscationTable.MethodDoRenderFishHook, ObfuscationTable.MethodDoRenderFishHookDesc);
 			System.out.println("Improved First Person Mod: Successfully modified doRenderFishHook in RenderFish");
 			return returnVal;
-		} else
-		if(name.equals(ObfuscationTable.ClassRenderGlobal)) {
-			System.out.println(ObfuscationTable.MethodRenderEntities + " " + ObfuscationTable.MethodRenderEntitiesDesc);
+		}
+		else if (name.equals(ObfuscationTable.ClassRenderGlobal)) {
 			byte[] returnVal = ClassTransformHelper.injectSimpleHookAtProfilerSection(bytes, ObfuscationTable.MethodRenderEntities, ObfuscationTable.MethodRenderEntitiesDesc, "kes5219/improvedfirstperson/hooks/RenderEntityHook", "onRenderEntities", "tileentities");
 			System.out.println("Improved First Person Mod: Successfully modified renderEntities in RenderGlobal");
+			return returnVal;
+		}
+		else if (name.equals(ObfuscationTable.ClassItemEditableBook) || name.equals(ObfuscationTable.ClassItemWritableBook))
+		{
+			byte[] returnVal = ClassTransformHelper.injectCustomHook(bytes, new MethodOnItemRightClickTransformer(),
+					ObfuscationTable.MethodOnItemRightClick, ObfuscationTable.MethodOnItemRightClickDesc);
+			System.out.println("Improved First Person Mod: Successfully modified onItemRightClick in " +
+					(name.equals(ObfuscationTable.ClassItemEditableBook) ? "ItemEditableBook" : "ItemWritableBook"));
+			
+			returnVal = ClassTransformHelper.injectCustomHook(bytes, new MethodOnItemRightClickTransformer(),
+					ObfuscationTable.MethodOnItemRightClick, ObfuscationTable.MethodOnItemRightClickDesc);
+			System.out.println("Improved First Person Mod: Successfully modified onItemRightClick in " +
+					(name.equals(ObfuscationTable.ClassItemEditableBook) ? "ItemEditableBook" : "ItemWritableBook"));
+			
 			return returnVal;
 		}
 		
@@ -107,6 +135,20 @@ public class ClassTransformer implements IClassTransformer {
 				mv.visitMethodInsn(Opcodes.INVOKESTATIC, "kes5219/improvedfirstperson/hooks/MouseSelectionOverride", "onMethodEnd", "()V");
 			}
 			mv.visitInsn(opcode);
+		}
+	}
+	
+	private class MethodOnItemRightClickTransformer extends CustomMethodTransformer {
+		
+		public void visitCode() {
+			mv.visitCode();
+			//returns if returned value is not true;
+			Label label0 = new Label();
+			mv.visitMethodInsn(Opcodes.INVOKESTATIC, "kes5219/improvedfirstperson/hooks/BookHook", "shouldSkip", "()Z");
+			mv.visitJumpInsn(Opcodes.IFEQ, label0);
+			mv.visitVarInsn(Opcodes.ALOAD, 1);
+			mv.visitInsn(Opcodes.ARETURN);
+			mv.visitLabel(label0);
 		}
 	}
 }

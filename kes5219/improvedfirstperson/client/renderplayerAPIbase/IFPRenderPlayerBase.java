@@ -9,13 +9,18 @@ import kes5219.utils.misc.PartialTickRetriever;
 
 import org.lwjgl.opengl.GL11;
 
+import api.player.render.RenderPlayerAPI;
+import api.player.render.RenderPlayerBase;
+
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.client.model.ModelBox;
 import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.item.EnumAction;
@@ -23,8 +28,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemCarrotOnAStick;
 import net.minecraft.item.ItemStack;
-import net.minecraft.src.RenderPlayerAPI;
-import net.minecraft.src.RenderPlayerBase;
+import net.minecraft.item.ItemSword;
+import net.minecraft.item.ItemTool;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraftforge.client.MinecraftForgeClient;
@@ -42,7 +47,7 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 	}*/
 
 	@Override
-	public void renderSpecialHeadArmor(EntityPlayer player, float partialTick) {
+	public void renderSpecialHeadArmor(AbstractClientPlayer player, float partialTick) {
 		Minecraft mc = IFPClientProxy.mc;
 		/*if(mc.gameSettings.thirdPersonView > 0 && var1 == mc.renderViewEntity) {
 			renderPlayer.localRenderSpecialHeadArmor(var1, var2);
@@ -79,7 +84,7 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 	HashMap<Integer, ArrayList<ArrowPosition>> arrowCache = new HashMap();
 
 	@Override
-	public void renderArrowsStuckInEntity(EntityLiving entity, float partialTick)
+	public void renderArrowsStuckInEntity(EntityLivingBase entity, float partialTick)
 	{
 		if (entity == IFPClientProxy.mc.thePlayer)
 		{
@@ -191,7 +196,7 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 	private static final float swingCancel = 0.7F;
 
 	@Override
-	public void afterPositionSpecialItemInHand(EntityPlayer player, float partialTick, EnumAction useAction, ItemStack heldStack) {
+	public void afterPositionSpecialItemInHand(AbstractClientPlayer player, float partialTick, EnumAction useAction, ItemStack heldStack) {
 		if (player == IFPClientProxy.mc.thePlayer && IFPClientProxy.mc.gameSettings.thirdPersonView == 0)
 			RenderHelper.enableStandardItemLighting();
 
@@ -252,7 +257,7 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 		{
 			Item heldItem = player.getHeldItem().getItem();
 
-			if (heldItem.isFull3D() && !(heldItem instanceof ItemCarrotOnAStick))
+			if (heldItem instanceof ItemTool || heldItem instanceof ItemSword)
 			{
 				float actualSwing = player.getSwingProgress(partialTick);
 				float rot = actualSwing * swingRotation + swingRotationWindup;

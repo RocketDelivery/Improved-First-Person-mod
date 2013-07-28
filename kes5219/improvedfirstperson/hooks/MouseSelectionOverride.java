@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.GLAllocation;
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.src.ModLoader;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
@@ -32,10 +33,11 @@ public class MouseSelectionOverride {
 	//due to camera offset done in AfterCameraTransformation class.
 	public static void onMethodStart() {
 		Minecraft mc = IFPClientProxy.mc;
-		if(mc.renderViewEntity != null && mc.gameSettings.thirdPersonView == 0)
+		
+		if(mc.renderViewEntity != null && mc.gameSettings != null && mc.gameSettings.thirdPersonView == 0)
 		{
 			shouldRestore = true;
-			EntityLiving viewEntity = mc.renderViewEntity;
+			EntityLivingBase viewEntity = mc.renderViewEntity;
 			tempPosX = viewEntity.posX;
 			tempPosY = viewEntity.posY;
 			tempPosZ = viewEntity.posZ;
@@ -59,7 +61,7 @@ public class MouseSelectionOverride {
 	public static void onMethodEnd() {
 		if(shouldRestore)
 		{
-			EntityLiving viewEntity = IFPClientProxy.mc.renderViewEntity;
+			EntityLivingBase viewEntity = IFPClientProxy.mc.renderViewEntity;
 			viewEntity.posX = tempPosX;
 			viewEntity.posY = tempPosY;
 			viewEntity.posZ = tempPosZ;

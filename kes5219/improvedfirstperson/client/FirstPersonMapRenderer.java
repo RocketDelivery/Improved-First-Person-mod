@@ -6,14 +6,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.MapData;
 import net.minecraftforge.client.IItemRenderer;
 
 public class FirstPersonMapRenderer implements IItemRenderer {
+	
+	public static ResourceLocation mapBackLoc = new ResourceLocation("textures/map/map_background.png");
+	
 	public FirstPersonMapRenderer(){
 		
 	}
-	
 	 
 	public boolean handleRenderType(ItemStack item, ItemRenderType type) {
 		if(type == IItemRenderer.ItemRenderType.EQUIPPED)
@@ -41,8 +44,7 @@ public class FirstPersonMapRenderer implements IItemRenderer {
         GL11.glTranslatef(-2.4F, -2.0F, 0.0F);
         float f20 = 0.015625F;
         GL11.glScalef(f20, f20, f20);
-        //mc.renderEngine.bind
-        mc.renderEngine.bindTexture("/misc/mapbg.png"); //TODO check bindTexture
+        mc.renderEngine.bindTexture(mapBackLoc); //TODO check bindTexture
         Tessellator tessellator = Tessellator.instance;
         GL11.glNormal3f(0.0F, 0.0F, -1F);
         tessellator.startDrawingQuads();
@@ -52,6 +54,7 @@ public class FirstPersonMapRenderer implements IItemRenderer {
         tessellator.addVertexWithUV(128 + byte0, 0 - byte0, 0.0D, 1.0D, 0.0D);
         tessellator.addVertexWithUV(0 - byte0, 0 - byte0, 0.0D, 0.0D, 0.0D);
         tessellator.draw();
+        
         if(item.itemID == Item.map.itemID) {
 	        MapData mapdata = Item.map.getMapData(item, mc.theWorld);
 	        if(mapdata != null) {

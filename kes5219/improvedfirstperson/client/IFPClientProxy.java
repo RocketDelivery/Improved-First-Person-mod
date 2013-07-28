@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+import api.player.model.ModelPlayerAPI;
+import api.player.render.RenderPlayerAPI;
+
 import cpw.mods.fml.client.registry.KeyBindingRegistry;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -11,10 +14,9 @@ import cpw.mods.fml.common.registry.TickRegistry;
 import cpw.mods.fml.relauncher.Side;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
-import net.minecraft.src.ModelPlayerAPI;
-import net.minecraft.src.RenderPlayerAPI;
 import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.event.ForgeSubscribe;
 import kes5219.improvedfirstperson.client.renderplayerAPIbase.IFPModelPlayerBase;
 import kes5219.improvedfirstperson.client.renderplayerAPIbase.IFPRenderPlayerBase;
 import kes5219.improvedfirstperson.common.IFPCommonProxy;
@@ -39,5 +41,11 @@ public class IFPClientProxy extends IFPCommonProxy {
 		//AfterCameraTransformation.init();
 		MinecraftForgeClient.registerItemRenderer(Item.map.itemID, new FirstPersonMapRenderer());
 		MinecraftForgeClient.registerItemRenderer(EMPTYMAPITEMID, new FirstPersonMapRenderer());		
+	}
+	
+	//@ForgeSubscribe
+	public void renderHelmetOverlay()
+	{
+		
 	}
 }

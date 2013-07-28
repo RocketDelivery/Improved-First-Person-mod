@@ -15,13 +15,19 @@ public class RenderFishHook {
 	//Class transformer is used to inject a code calling the following method in
 	//the beginning of the method doRenderFishHook in class RenderFish.
 	public static void onMethodStart() {
-		thirdPersonViewTemp = IFPClientProxy.mc.gameSettings.thirdPersonView;
-		IFPClientProxy.mc.gameSettings.thirdPersonView = 1;
+		if (ModImprovedFirstPerson.enableBodyRender)
+		{
+			thirdPersonViewTemp = IFPClientProxy.mc.gameSettings.thirdPersonView;
+			IFPClientProxy.mc.gameSettings.thirdPersonView = 1;
+		}
 	}
 	
 	//Class transformer is used to inject a code calling the following method in
 	//the beginning of the method doRenderFishHook in class RenderFish.
 	public static void onMethodEnd() {
-		IFPClientProxy.mc.gameSettings.thirdPersonView = thirdPersonViewTemp;
+		if (ModImprovedFirstPerson.enableBodyRender)
+		{
+			IFPClientProxy.mc.gameSettings.thirdPersonView = thirdPersonViewTemp;
+		}
 	}
 }
