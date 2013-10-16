@@ -32,9 +32,9 @@ public class MouseSelectionOverride {
 	//The primary purpose of these two methods is to fix the problem with block selection
 	//due to camera offset done in AfterCameraTransformation class.
 	public static void onMethodStart() {
-		Minecraft mc = IFPClientProxy.mc;
+		Minecraft mc = IFPClientProxy.getMC();
 		
-		if(mc.renderViewEntity != null && mc.gameSettings != null && mc.gameSettings.thirdPersonView == 0)
+		if(mc != null && mc.renderViewEntity != null && mc.gameSettings != null && mc.gameSettings.thirdPersonView == 0)
 		{
 			shouldRestore = true;
 			EntityLivingBase viewEntity = mc.renderViewEntity;
@@ -61,7 +61,7 @@ public class MouseSelectionOverride {
 	public static void onMethodEnd() {
 		if(shouldRestore)
 		{
-			EntityLivingBase viewEntity = IFPClientProxy.mc.renderViewEntity;
+			EntityLivingBase viewEntity = IFPClientProxy.getMC().renderViewEntity;
 			viewEntity.posX = tempPosX;
 			viewEntity.posY = tempPosY;
 			viewEntity.posZ = tempPosZ;

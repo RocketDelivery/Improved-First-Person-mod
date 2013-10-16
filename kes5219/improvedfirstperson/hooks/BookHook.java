@@ -17,17 +17,16 @@ public class BookHook {
 	
 	//Class transformer is used to inject the following code at the beginning of the method
 	//onItemRightClick(ItemStack stack, World world, EntityPlayer player) in ItemEditable and ItemWritable :
-	//if(!OnUseBookHook.shouldSkip()) return;
+	//if(BookHook.cancelOpeningGUI()) return;
 	//By returning true, it will cause written books not to open their GUI.
-    public static boolean shouldSkip()
+    public static boolean cancelOpeningGUI()
 	{
-    	System.out.println("skip");
+    	//System.out.println("skip");
     	return false;
 	}
     
     public void onUpdate(ItemStack stack, World world, Entity entity, int par4, boolean par5)
     {
-    	
     }
     
 }

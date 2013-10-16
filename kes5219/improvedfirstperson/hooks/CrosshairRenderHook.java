@@ -23,7 +23,8 @@ public class CrosshairRenderHook {
 	private static FloatBuffer win_pos = GLAllocation.createDirectFloatBuffer(16);
 
 	public static void calculateCrosshairPos() {
-		Minecraft mc = IFPClientProxy.mc;
+		Minecraft mc = IFPClientProxy.getMC();
+		
 		if(mc.objectMouseOver != null) {
 			float partialTick = PartialTickRetriever.getPartialTick();
 			float xDiff;
@@ -67,7 +68,7 @@ public class CrosshairRenderHook {
 	}
 	
 	private static void renderCustomCrosshair(GuiIngame gui) {
-		Minecraft mc = IFPClientProxy.mc;
+		Minecraft mc = IFPClientProxy.getMC();
 		ScaledResolution var5 = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight);
         int var6 = var5.getScaledWidth();
         gui.drawTexturedModalRect(var6 / 2 - 7, 113-((int)(relCrosshairPos / var5.getScaleFactor())-120), 0, 0, 16, 16);

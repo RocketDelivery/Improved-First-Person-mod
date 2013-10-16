@@ -33,7 +33,7 @@ public class IFPKeyHandler extends KeyHandler {
 	@Override
 	public void keyDown(EnumSet<TickType> types, KeyBinding kb, boolean tickEnd, boolean isRepeat)
 	{
-		if (tickEnd && IFPClientProxy.mc.currentScreen == null)
+		if (tickEnd && IFPClientProxy.getMC().currentScreen == null)
 		{
 			if (kb.keyCode == toggle.keyCode)
 			{

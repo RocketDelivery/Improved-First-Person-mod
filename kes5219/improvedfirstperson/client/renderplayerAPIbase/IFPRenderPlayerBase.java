@@ -19,6 +19,7 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -27,6 +28,7 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBow;
 import net.minecraft.item.ItemCarrotOnAStick;
+import net.minecraft.item.ItemFishingRod;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.item.ItemTool;
@@ -39,6 +41,9 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 		super(renderPlayerAPI);
 	}
 
+    public void afterRenderModel(EntityLivingBase entity, float limbSwing, float limbYaw, float existedTicksPartial, float headYawOffset, float pitch, float scale)
+    {
+    }
 	/*
 	public void drawFirstPersonHand(EntityPlayer entityPlayer) {
 		new Exception().printStackTrace();
@@ -48,13 +53,13 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 
 	@Override
 	public void renderSpecialHeadArmor(AbstractClientPlayer player, float partialTick) {
-		Minecraft mc = IFPClientProxy.mc;
+		Minecraft mc = IFPClientProxy.getMC();
 		/*if(mc.gameSettings.thirdPersonView > 0 && var1 == mc.renderViewEntity) {
 			renderPlayer.localRenderSpecialHeadArmor(var1, var2);
 		}*/
 		if(player != mc.renderViewEntity ||
 				mc.gameSettings.thirdPersonView > 0 ||
-				RenderManager.instance.playerViewY == 180.0f/*if the inventory is open*/) {
+				RenderManager.instance.playerViewY == 180/*if the inventory is open*/) {
 			renderPlayer.localRenderSpecialHeadArmor(player, partialTick);
 		}
 	}
@@ -86,7 +91,9 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 	@Override
 	public void renderArrowsStuckInEntity(EntityLivingBase entity, float partialTick)
 	{
-		if (entity == IFPClientProxy.mc.thePlayer)
+		Minecraft mc = IFPClientProxy.getMC();
+		
+		if (entity == mc.thePlayer)
 		{
 			int arrowCount = entity.getArrowCountInEntity();
 	
@@ -139,7 +146,7 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 						int tries = 0;
 	
 						while (tries < 10 && (modelRenderer == null ||
-								(entity == IFPClientProxy.mc.renderViewEntity &&
+								(entity == mc.renderViewEntity &&
 								headBB.isVecInside(entity.worldObj.getWorldVec3Pool().getVecFromPool(arrowX, arrowY, arrowZ)))))
 						{
 							modelRenderer = renderPlayer.getMainModelField().getRandomModelBox(random);
@@ -197,7 +204,9 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 
 	@Override
 	public void afterPositionSpecialItemInHand(AbstractClientPlayer player, float partialTick, EnumAction useAction, ItemStack heldStack) {
-		if (player == IFPClientProxy.mc.thePlayer && IFPClientProxy.mc.gameSettings.thirdPersonView == 0)
+		Minecraft mc = IFPClientProxy.getMC();
+		
+		if (player == mc.thePlayer && mc.gameSettings.thirdPersonView == 0)
 			RenderHelper.enableStandardItemLighting();
 
 		//render bow on player's left hand
@@ -244,21 +253,23 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 				GL11.glTranslatef(0, -yOff, -zOff);
 			}
 
-			GL11.glRotatef(-120.0F, 1.0F, 0.0F, 0.0F);
+			GL11.glRotatef(-120, 1, 0, 0);
 
 			rot = Math.abs(rot);
 
 			if (rot > 0)
 			{
-				GL11.glRotatef(10F + rot, 0.0F, 1.0F, 0.0F); //Y-axis
+				GL11.glRotatef(10F + rot, 0, 1, 0); //Y-axis
 			}
 		}
 		else if (player.isSwingInProgress && player.swingProgress > 0)
 		{
 			Item heldItem = player.getHeldItem().getItem();
 
-			if (heldItem instanceof ItemTool || heldItem instanceof ItemSword)
+			if (heldItem.isFull3D())
 			{
+				boolean rotatedAround = heldItem.shouldRotateAroundWhenRendering();
+				
 				float actualSwing = player.getSwingProgress(partialTick);
 				float rot = actualSwing * swingRotation + swingRotationWindup;
 
@@ -269,9 +280,35 @@ public class IFPRenderPlayerBase extends RenderPlayerBase {
 					cancel = cancel / (1 - swingCancel) * swingRotation;
 					rot -= cancel;
 				}
-
+				
+				if (rotatedAround)
+				{
+                    GL11.glRotatef(-180, 0, 0, 1);
+                    GL11.glTranslatef(0, 0.125F, 0);
+                    
+                    if (player.fishEntity == null)
+                    	rot *= 0.75F;
+                    else if (heldItem instanceof ItemFishingRod)
+                    	rot = 0;
+				}
+				
 				GL11.glRotatef(rot, 1, 0, 0.6F);
+				
+				if (rotatedAround)
+				{
+                    GL11.glRotatef(180, 0, 0, 1);
+                    GL11.glTranslatef(0, -0.125F, 0);
+				}
 			}
 		}
+	}
+	
+	@Override
+	public void positionSpecialItemInHand(AbstractClientPlayer player, float partialTick, EnumAction action, ItemStack stack)
+	{
+        if (player.fishEntity != null)
+        	stack.itemID = Item.fishingRod.itemID;
+        
+        renderPlayer.localPositionSpecialItemInHand(player, partialTick, action, stack);
 	}
 }

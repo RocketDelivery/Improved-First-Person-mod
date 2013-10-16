@@ -19,13 +19,13 @@ public class RenderEntityHook {
 	//The primary purpose of this method is to enable rendering of the player body
 	//even in first person mod.
 	public static void onRenderEntities() {
-		Minecraft mc = IFPClientProxy.mc;
+		Minecraft mc = IFPClientProxy.getMC();
 		
 		if (ModImprovedFirstPerson.enableBodyRender &&
 				mc.gameSettings.thirdPersonView == 0 &&
 				!mc.thePlayer.isPlayerSleeping() &&
 				mc.renderViewEntity.shouldRenderInPass(MinecraftForgeClient.getRenderPass())) {
-			RenderManager.instance.renderEntity(IFPClientProxy.mc.renderViewEntity, PartialTickRetriever.getPartialTick());
+			RenderManager.instance.renderEntity(mc.renderViewEntity, PartialTickRetriever.getPartialTick());
 		}
 	}
 }

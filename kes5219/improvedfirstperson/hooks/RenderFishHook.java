@@ -17,8 +17,9 @@ public class RenderFishHook {
 	public static void onMethodStart() {
 		if (ModImprovedFirstPerson.enableBodyRender)
 		{
-			thirdPersonViewTemp = IFPClientProxy.mc.gameSettings.thirdPersonView;
-			IFPClientProxy.mc.gameSettings.thirdPersonView = 1;
+			Minecraft mc = IFPClientProxy.getMC();
+			thirdPersonViewTemp = mc.gameSettings.thirdPersonView;
+			mc.gameSettings.thirdPersonView = 1;
 		}
 	}
 	
@@ -27,7 +28,7 @@ public class RenderFishHook {
 	public static void onMethodEnd() {
 		if (ModImprovedFirstPerson.enableBodyRender)
 		{
-			IFPClientProxy.mc.gameSettings.thirdPersonView = thirdPersonViewTemp;
+			IFPClientProxy.getMC().gameSettings.thirdPersonView = thirdPersonViewTemp;
 		}
 	}
 }

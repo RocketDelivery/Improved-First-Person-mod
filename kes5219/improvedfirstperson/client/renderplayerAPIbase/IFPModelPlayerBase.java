@@ -1,9 +1,12 @@
 package kes5219.improvedfirstperson.client.renderplayerAPIbase;
 
+import org.lwjgl.opengl.GL11;
+
 import api.player.model.ModelPlayer;
 import api.player.model.ModelPlayerAPI;
 import api.player.model.ModelPlayerBase;
 import kes5219.improvedfirstperson.client.IFPClientProxy;
+import kes5219.improvedfirstperson.common.ModImprovedFirstPerson;
 import kes5219.utils.misc.PartialTickRetriever;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -49,15 +52,18 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 		Minecraft mc = Minecraft.getMinecraft();
 		EntityPlayer player = (EntityPlayer)entity;
 		float partialTick = PartialTickRetriever.getPartialTick();
+		
+		boolean clientPlayer = entity == mc.renderViewEntity;
+		boolean invPlayer = RenderManager.instance.playerViewY == 180;
 
-		if (RenderManager.instance.playerViewY == 180.0f) {
+		if (invPlayer) {
 			//if the inventory screen is open
 			modelPlayer.bipedHead.isHidden = false;
 			modelPlayer.bipedHeadwear.isHidden = false;
 			return;
 		}
 
-		if ((mc.gameSettings.thirdPersonView == 0 && entity == mc.renderViewEntity) || mc.renderViewEntity.isPlayerSleeping()) {
+		if ((mc.gameSettings.thirdPersonView == 0 && clientPlayer) || mc.renderViewEntity.isPlayerSleeping()) {
 			modelPlayer.bipedHead.isHidden = true;
 			modelPlayer.bipedHeadwear.isHidden = true;
 		} else {
@@ -81,7 +87,7 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 
 		if (modelPlayer.aimedBow) {
 			float rotationYaw = player.prevRotationYawHead + (player.rotationYawHead - player.prevRotationYawHead) * partialTick; 
-			player.renderYawOffset = rotationYaw + 40;
+			//player.renderYawOffset = rotationYaw + 40;
 			modelPlayer.bipedLeftArm.rotateAngleY += 0.15F;
 
 			ticksExistedPartial = ticksExistedPartial * 6.0f;
@@ -97,6 +103,12 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 
 			if (headAngle > 0)
 			{
+				modelPlayer.bipedRightArm.rotateAngleX -= rot * 2;
+				modelPlayer.bipedRightArm.rotateAngleY -= rot;
+				
+				if (clientPlayer && mc.gameSettings.thirdPersonView == 0 && ModImprovedFirstPerson.enableBodyRender)
+					modelPlayer.bipedRightArm.rotationPointX -= rot * 3F;
+				
 				modelPlayer.bipedLeftArm.rotateAngleY += rot;
 
 				rot -= 0.5F;
@@ -130,20 +142,18 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 		}
 
 		// Make player lean over when looking down
-		if (entity.rotationPitch > 0 && !modelPlayer.isRiding)
+		if (entity.rotationPitch > 0 && !modelPlayer.isRiding &&
+				(ModImprovedFirstPerson.enableBodyRender || !clientPlayer || invPlayer))
 		{
 			float off;
-			float fovMult = ((mc.thePlayer != entity || mc.gameSettings.thirdPersonView > 0) ? 0.75F : (mc.gameSettings.fovSetting + 1));
-
-			if (fovMult > 1.75F)
-				fovMult = 1.75F;
+			float mult = ModImprovedFirstPerson.leanAmount;
 			
 			ItemStack heldItem = player.getHeldItem();
 			boolean map = heldItem != null && (heldItem.getItem() instanceof ItemMapBase);
 
 			if (!map)
 			{
-				off = Math.abs(entity.rotationPitch / 250F * fovMult);
+				off = Math.abs(entity.rotationPitch / 250F * mult);
 				
 				if (player.isUsingItem())
 				{
@@ -161,19 +171,20 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 
 			if (!modelPlayer.isSneak)
 			{
-				off = entity.rotationPitch / 180F * fovMult;
+				off = entity.rotationPitch / 180F * mult;
 				modelPlayer.bipedBody.rotateAngleX += off;
 
-				off = entity.rotationPitch / 16F * fovMult;
+				off = entity.rotationPitch / 16F * mult;
 				modelPlayer.bipedRightLeg.rotationPointZ += off;
 				modelPlayer.bipedLeftLeg.rotationPointZ += off;
 
-				off = Math.abs(entity.rotationPitch / 50F * fovMult);
+				off = Math.abs(entity.rotationPitch / 50F * mult);
 				modelPlayer.bipedRightLeg.rotationPointY -= off;
 				modelPlayer.bipedLeftLeg.rotationPointY -= off;
 			}
 		}
 		
+		// Eating animation
 		if (player.isUsingItem())
 		{
 			ItemStack heldItemStack = player.getHeldItem();
@@ -186,11 +197,15 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 				if (action == EnumAction.eat || action == EnumAction.drink)
 				{
                     float useLeftPartial = (float)player.getItemInUseCount() + 1 - partialTick;
-                    float progress = useLeftPartial / (float)heldItemStack.getMaxItemUseDuration();
-                    float moveAmount = progress * progress * progress;
+                    float progressLeft = useLeftPartial / (float)heldItemStack.getMaxItemUseDuration();
+                    float moveAmount = progressLeft * progressLeft * progressLeft;
                     moveAmount = moveAmount * moveAmount * moveAmount;
                     moveAmount = moveAmount * moveAmount * moveAmount;
                     moveAmount = 1.0F - moveAmount;
+
+                    float preAngleX = modelPlayer.bipedRightArm.rotateAngleX;
+                    float preAngleY = modelPlayer.bipedRightArm.rotateAngleY;
+                    float preAngleZ = modelPlayer.bipedRightArm.rotateAngleZ;
 					
 					modelPlayer.bipedRightArm.rotateAngleX -= moveAmount * 1.25F;
 					modelPlayer.bipedRightArm.rotateAngleY -= moveAmount / 2;
@@ -198,7 +213,7 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 
 					float bodyYaw = player.prevRenderYawOffset + (player.renderYawOffset - player.prevRenderYawOffset) * partialTick;
 					float headYaw = player.prevRotationYawHead + (player.rotationYawHead - player.prevRotationYawHead) * partialTick;
-					float offset = (headYaw - bodyYaw) / 80 * moveAmount;
+					float offset = MathHelper.wrapAngleTo180_float(headYaw - bodyYaw) / 80 * moveAmount;
 
 					modelPlayer.bipedRightArm.rotateAngleX += offset / 2.5F;
 					modelPlayer.bipedRightArm.rotateAngleY += offset + 0.2F;
@@ -215,6 +230,20 @@ public class IFPModelPlayerBase  extends ModelPlayerBase {
 						offset /= 1.5F;
 
 					modelPlayer.bipedRightArm.rotateAngleX += offset;
+					
+                    modelPlayer.bipedRightArm.rotateAngleX += MathHelper.abs(MathHelper.cos(useLeftPartial / 4.0F * (float)Math.PI) * 0.125F) * (progressLeft > 0.2F ? -1 : 0);
+                    //modelPlayer.bipedRightArm.rotateAngleZ += (1 - progressLeft) * 0.1;
+
+                    float diffAngleX = modelPlayer.bipedRightArm.rotateAngleX - preAngleX;
+                    float diffAngleY = modelPlayer.bipedRightArm.rotateAngleY - preAngleY;
+                    float diffAngleZ = modelPlayer.bipedRightArm.rotateAngleZ - preAngleZ;
+                    
+                    float mult = Math.min(progressLeft / 0.2F, 1);
+                    mult *= mult * mult;
+
+                    modelPlayer.bipedRightArm.rotateAngleX = preAngleX + diffAngleX * mult;
+                    modelPlayer.bipedRightArm.rotateAngleY = preAngleY + diffAngleY * mult;
+                    modelPlayer.bipedRightArm.rotateAngleZ = preAngleZ + diffAngleZ * mult;
 				}
 			}
 		}
